@@ -194,7 +194,7 @@ A **forma** da função de aptidão afeta drasticamente a **velocidade e a quali
 
 ## 13.6 Operadores Genéticos
 
-Os **operadores genéticos** são as operações que transformam uma geração na seguinte: **seleção**, **cruzamento**, **mutação** e **elitismo**. Cada um tem um papel distinto no equilíbrio entre **explorar** o espaço (buscar novidade) e **explotar** o que já é bom (refinar) — o mesmo dilema exploração/explotação que encontramos no RL, aqui em outra roupagem.
+Os **operadores genéticos** são as operações que transformam uma geração na seguinte: **seleção**, **cruzamento**, **mutação** e **elitismo**. Cada um tem um papel distinto no equilíbrio entre **explorar** o espaço (buscar novidade) e **fazer *exploitation*** do que já é bom (refinar) — o mesmo dilema exploração/*exploitation* que encontramos no RL, aqui em outra roupagem.
 
 ### Seleção
 
@@ -210,7 +210,7 @@ O ponto comum a todas: a seleção não deve ser **gananciosa demais** (pegar s�
 
 ### Crossover
 
-O **cruzamento** (*crossover*) combina os genes de **dois pais** para gerar um ou mais **filhos**, na esperança de que juntar partes boas de bons pais produza filhos melhores. É o operador que faz a **explotação** — recombinar o material genético promissor já existente. As principais variantes:
+O **cruzamento** (*crossover*) combina os genes de **dois pais** para gerar um ou mais **filhos**, na esperança de que juntar partes boas de bons pais produza filhos melhores. É o operador que faz a ***exploitation*** — recombinar o material genético promissor já existente. As principais variantes:
 
 - **Crossover de um ponto.** Escolhe-se um **ponto de corte** aleatório ao longo do cromossomo; o filho herda os genes de um pai **antes** do corte e do outro pai **depois** do corte. Simples e clássico. Exemplo: pais `AAAA|AAAA` e `BBBB|BBBB` com corte no meio geram filhos `AAAABBBB` e `BBBBAAAA`.
 
@@ -242,7 +242,7 @@ O **elitismo** copia, sem alterações, as **melhores soluções** da geração 
 - **Impacto na convergência.** O elitismo **acelera** a convergência e a torna **monótona** (a melhor aptidão é uma curva que só sobe). Mas há um preço: elitismo **excessivo** (preservar muitos indivíduos) reduz a diversidade e pode **acelerar demais** a convergência prematura, pois os "eleitos" dominam a reprodução. A prática comum é preservar **poucos** dos melhores (por exemplo, 1 a 5% da população) — o suficiente para não perder o topo, sem sufocar a exploração.
 
 > **Boa Prática**
-> Pense nos quatro operadores como um sistema de **equilíbrio entre exploração e explotação**. Crossover e elitismo **explotam** (refinam e preservam o bom já encontrado); mutação **explora** (busca o novo); seleção **regula a pressão** entre os dois. Um GA que converge cedo demais e trava (convergência prematura) geralmente precisa de **mais exploração**: aumentar a mutação, reduzir o elitismo ou a pressão seletiva. Um GA que "não converge" e vagueia geralmente precisa de **mais explotação**: aumentar a pressão seletiva ou o elitismo. Ajustar um GA é, no fundo, calibrar essa balança.
+> Pense nos quatro operadores como um sistema de **equilíbrio entre exploração e *exploitation***. Crossover e elitismo **fazem *exploitation*** (refinam e preservam o bom já encontrado); mutação **explora** (busca o novo); seleção **regula a pressão** entre os dois. Um GA que converge cedo demais e trava (convergência prematura) geralmente precisa de **mais exploração**: aumentar a mutação, reduzir o elitismo ou a pressão seletiva. Um GA que "não converge" e vagueia geralmente precisa de **mais *exploitation***: aumentar a pressão seletiva ou o elitismo. Ajustar um GA é, no fundo, calibrar essa balança.
 
 [DIAGRAMA]
 Título: Os operadores genéticos em ação — seleção, crossover, mutação e elitismo
@@ -287,7 +287,7 @@ Vejamos como os Algoritmos Genéticos — e a otimização evolutiva em geral �
 - **A abordagem evolutiva.** Cada indivíduo é um **artefato de design**; a aptidão codifica as restrições e objetivos. Uma variante interessante é a **evolução interativa**, em que o **humano** atua como função de aptidão, escolhendo a cada geração os artefatos de que mais gosta — usada para gerar criaturas, texturas e conteúdo estético onde "qualidade" é subjetiva.
 
 > **Na Indústria**
-> A aplicação mais famosa de "evolução" em um jogo comercial não é bem um GA de otimização, mas ilustra o espírito: em ***Spore*** (Maxx/EA, 2008), as criaturas criadas pelos jogadores povoam o universo de outros jogadores, e o jogo tem forte tema evolutivo. Já a evolução como **ferramenta de otimização** (balanceamento, PCG, ajuste) tende a ser usada nos **bastidores do desenvolvimento**, não como recurso anunciado ao jogador — o que a torna menos visível, porém real, sobretudo em estúdios com equipes de pesquisa e nas ferramentas internas.
+> A aplicação mais famosa de "evolução" em um jogo comercial não é bem um GA de otimização, mas ilustra o espírito: em ***Spore*** (Maxis/EA, 2008), as criaturas criadas pelos jogadores povoam o universo de outros jogadores, e o jogo tem forte tema evolutivo. Já a evolução como **ferramenta de otimização** (balanceamento, PCG, ajuste) tende a ser usada nos **bastidores do desenvolvimento**, não como recurso anunciado ao jogador — o que a torna menos visível, porém real, sobretudo em estúdios com equipes de pesquisa e nas ferramentas internas.
 
 ---
 
@@ -399,7 +399,7 @@ Este capítulo apresentou as **heurísticas de otimização** e, em particular, 
 
 Construímos os **fundamentos** com a terminologia evolutiva no sentido computacional: **indivíduo** (uma solução candidata), **cromossomo** (sua codificação), **gene** (cada unidade do cromossomo), **população** (o conjunto de candidatos que evolui em paralelo), **aptidão/fitness** (o número que mede a qualidade) e **seleção natural** (a preferência probabilística pelos mais aptos). Detalhamos o **ciclo completo** do algoritmo — inicialização, avaliação, seleção, cruzamento, mutação, elitismo, nova geração e critério de parada — e a importância decisiva da **representação** (codificar a solução de modo que operações genéticas façam sentido e gerem soluções válidas) e da **função de aptidão** (a única forma de dizer ao algoritmo o que se quer, com o mesmo perigo de má especificação que a recompensa do RL).
 
-Dissecamos os **operadores genéticos**: **seleção** (roleta, torneio, ranqueamento — calibrando a pressão seletiva), **crossover** (um ponto, múltiplos pontos, uniforme — a explotação que recombina bons blocos), **mutação** (a exploração que injeta novidade e evita a **convergência prematura**, governada pela taxa de mutação) e **elitismo** (preservar os melhores, garantindo que a melhor aptidão nunca regrida). Aterrissamos em **aplicações** (balanceamento automático, geração procedural, evolução de comportamentos, ajuste de parâmetros, design procedural), **ferramentas** (implementação própria em C#, bibliotecas como GeneticSharp, neuroevolução com NEAT), uma discussão crítica de **vantagens e limitações** (generalidade e robustez a ótimos locais versus falta de garantia, custo e dependência da função de aptidão) e **estudos de caso** documentados (PCG acadêmica, competições de IA, NERO), sempre separando fato de análise e reforçando **quando usar** — e quando **não** usar — um GA frente a métodos exatos e ao RL.
+Dissecamos os **operadores genéticos**: **seleção** (roleta, torneio, ranqueamento — calibrando a pressão seletiva), **crossover** (um ponto, múltiplos pontos, uniforme — a *exploitation* que recombina bons blocos), **mutação** (a exploração que injeta novidade e evita a **convergência prematura**, governada pela taxa de mutação) e **elitismo** (preservar os melhores, garantindo que a melhor aptidão nunca regrida). Aterrissamos em **aplicações** (balanceamento automático, geração procedural, evolução de comportamentos, ajuste de parâmetros, design procedural), **ferramentas** (implementação própria em C#, bibliotecas como GeneticSharp, neuroevolução com NEAT), uma discussão crítica de **vantagens e limitações** (generalidade e robustez a ótimos locais versus falta de garantia, custo e dependência da função de aptidão) e **estudos de caso** documentados (PCG acadêmica, competições de IA, NERO), sempre separando fato de análise e reforçando **quando usar** — e quando **não** usar — um GA frente a métodos exatos e ao RL.
 
 ### Questões de Revisão
 

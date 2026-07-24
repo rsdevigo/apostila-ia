@@ -105,7 +105,7 @@ Para uma leitura orientada, o glossário pode ser cruzado com a **tabela-decisã
 
 **Evento** — Ocorrência que dispara a avaliação de transições em uma FSM (ex.: "viu o jogador", "vida baixa"). *Contexto:* FSMs por eventos reagem a estes gatilhos; FSMs por polling os verificam a cada quadro. *Ver:* Cap. 3.
 
-**Exploração versus explotação** — Dilema central da aprendizagem por reforço: explorar ações novas para descobrir recompensas ou explotar o que já se sabe ser bom. *Ver:* Cap. 12.
+**Exploração versus *exploitation*** — Dilema central da aprendizagem por reforço: explorar ações novas para descobrir recompensas ou fazer *exploitation* do que já se sabe ser bom. *Ver:* Cap. 12.
 
 ## F
 
@@ -179,7 +179,7 @@ Para uma leitura orientada, o glossário pode ser cruzado com a **tabela-decisã
 
 **ML-Agents** — Kit oficial da Unity para treinar agentes por aprendizagem por reforço (e imitação) integrando a engine a bibliotecas de aprendizado. *Ver:* Cap. 12; Apêndice B.
 
-**Monte Carlo Tree Search (MCTS)** — Algoritmo de busca que estima o valor das jogadas por simulações aleatórias (rollouts), equilibrando exploração e explotação; estado da arte em jogos como Go. *Contexto:* conteúdo de aprofundamento. *Ver:* Cap. 11 (seção de aprofundamento).
+**Monte Carlo Tree Search (MCTS)** — Algoritmo de busca que estima o valor das jogadas por simulações aleatórias (rollouts), equilibrando exploração e *exploitation*; estado da arte em jogos como Go. *Contexto:* conteúdo de aprofundamento. *Ver:* Cap. 11 (seção de aprofundamento).
 
 **Mutação** — Operador genético que altera aleatoriamente genes de um indivíduo, mantendo diversidade e evitando convergência prematura. *Ver:* Cap. 13.
 
@@ -252,7 +252,7 @@ Para uma leitura orientada, o glossário pode ser cruzado com a **tabela-decisã
 Este apêndice consolida, em formato de consulta, **como cada conceito da apostila se materializa em ferramentas**. O objetivo é o mesmo dos capítulos: **contextualizar**, não ensinar menus. Para o aprofundamento de cada técnica, consulte o capítulo indicado. As ferramentas de terceiros e as equivalências na Unreal Engine aparecem apenas como referência comparativa.
 
 > **Atenção**
-> A apostila não é um manual de Unity. As ferramentas evoluem e mudam de nome entre versões (por exemplo, o pacote **Unity Behavior** substituiu, na prática, o antigo Bolt/Behavior de terceiros para grafos oficiais). Trate a coluna "ferramenta oficial" como o ponto de partida atual, sempre confirmando na documentação da versão em uso.
+> A apostila não é um manual de Unity. As ferramentas evoluem e mudam de nome entre versões (por exemplo, o pacote **Unity Behavior**, de 2024, passou a ser a via oficial de grafos de comportamento; o antigo **Bolt**, de terceiros, foi absorvido pela Unity e virou o **Visual Scripting**). Trate a coluna "ferramenta oficial" como o ponto de partida atual, sempre confirmando na documentação da versão em uso.
 
 ## B.1 Relação conceito → ferramenta
 
@@ -428,7 +428,7 @@ Guia de apoio didático, organizado por Parte. Para cada uma, reúne os **concei
 
 **Parte VI — Aprendizado e adaptação (RL e algoritmos genéticos)**
 
-- *Conceitos essenciais:* agente–ambiente–recompensa; MDP; política e função valor; exploração × explotação; Q-Learning; população, aptidão, seleção, crossover, mutação, elitismo.
+- *Conceitos essenciais:* agente–ambiente–recompensa; MDP; política e função valor; exploração × *exploitation*; Q-Learning; população, aptidão, seleção, crossover, mutação, elitismo.
 - *Dificuldades comuns:* projetar a função de recompensa/aptidão; aceitar a imprevisibilidade e o custo de treino.
 - *Erros conceituais recorrentes:* superestimar o uso comercial de RL; confundir treino (offline, caro) com execução (em jogo); tratar o AG como se garantisse o ótimo.
 - *Demonstração sugerida:* um exemplo tabular de Q-Learning (grade simples) e um AG evoluindo um parâmetro com o fitness subindo por geração; se possível, um ambiente do ML-Agents.

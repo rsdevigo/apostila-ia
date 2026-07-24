@@ -305,6 +305,9 @@ Concretamente, distinguem-se dois casos, com nomes tradicionais:
 - **Corte beta (β-cutoff):** ocorre em um nó **MAX**. Se, ao avaliar os filhos, MAX encontra um valor ≥ β, ele para. Razão: MIN, no nível acima, já tem uma opção que limita o resultado a β; se este nó MAX pode alcançar algo ≥ β, MIN simplesmente não permitirá que se chegue aqui. Os demais filhos deste nó MAX são irrelevantes.
 - **Corte alfa (α-cutoff):** ocorre em um nó **MIN**. Se, ao avaliar os filhos, MIN encontra um valor ≤ α, ele para. Razão: MAX, no nível acima, já garante α por outro caminho; se este nó MIN pode forçar algo ≤ α, MAX nunca escolherá vir para cá. Os demais filhos deste nó MIN são irrelevantes.
 
+> **Atenção**
+> A *nomenclatura* dos cortes varia entre as fontes. Aqui, "corte beta" nomeia a poda que ocorre em um nó **MAX** (quando o valor alcança β) e "corte alfa" a que ocorre em um nó **MIN** (quando o valor cai a α). Alguns textos (incluindo Russell & Norvig) descrevem o mesmo mecanismo em termos de *quem atualiza qual limite* — MAX eleva α, MIN reduz β —, o que pode inverter a impressão de qual letra "pertence" a cada nó. O algoritmo é idêntico; apenas a rotulagem difere. Ao resolver um exercício, verifique a convenção adotada pela fonte.
+
 ### Eliminação de ramos: um exemplo
 
 Retomemos o exemplo numérico da Seção 11.3.3 (raiz MAX; jogadas A, B, C; cada uma levando a um nó MIN com dois filhos): A→(3,5), B→(6,2), C→(1,8).
@@ -380,7 +383,7 @@ O nome "Monte Carlo" vem justamente desse uso de **amostragem aleatória** para 
 
 Cada iteração do MCTS executa **quatro fases**, repetidas milhares de vezes dentro do orçamento de tempo:
 
-**1. Seleção.** Partindo da raiz, o algoritmo desce pela árvore já construída, escolhendo a cada nó o filho mais "interessante", até chegar a um nó ainda não totalmente expandido. A escolha equilibra dois impulsos conflitantes: **exploração** (experimentar jogadas pouco testadas, que podem ser boas surpresas) e **explotação** (aprofundar jogadas que já se mostraram boas). Esse equilíbrio é governado por uma fórmula chamada **UCT** (*Upper Confidence Bound applied to Trees*), que combina a taxa de vitórias observada de um nó com um termo que favorece nós pouco visitados. É a mesma matemática do problema clássico do "caça-níqueis de múltiplos braços" (*multi-armed bandit*): como distribuir tentativas entre opções incertas para maximizar o ganho.
+**1. Seleção.** Partindo da raiz, o algoritmo desce pela árvore já construída, escolhendo a cada nó o filho mais "interessante", até chegar a um nó ainda não totalmente expandido. A escolha equilibra dois impulsos conflitantes: **exploração** (experimentar jogadas pouco testadas, que podem ser boas surpresas) e ***exploitation*** (aprofundar jogadas que já se mostraram boas). Esse equilíbrio é governado por uma fórmula chamada **UCT** (*Upper Confidence Bound applied to Trees*), que combina a taxa de vitórias observada de um nó com um termo que favorece nós pouco visitados. É a mesma matemática do problema clássico do "caça-níqueis de múltiplos braços" (*multi-armed bandit*): como distribuir tentativas entre opções incertas para maximizar o ganho.
 
 **2. Expansão.** Ao chegar a um nó com jogadas ainda não representadas na árvore, adiciona-se um (ou mais) **novo nó filho** — expandindo a árvore em direção a uma posição ainda não explorada.
 
