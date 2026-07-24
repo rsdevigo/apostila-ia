@@ -45,6 +45,28 @@ Título: Anatomia de uma máquina de estados hierárquica
 Objetivo pedagógico: Mostrar visualmente a organização em níveis — superestados contendo submáquinas — e como as transições comuns migram para o superestado.
 Descrição detalhada: Diagrama com dois grandes retângulos arredondados representando superestados, dispostos lado a lado: "PACÍFICO" e "COMBATE". Dentro de "Pacífico", uma submáquina com os subestados Patrulhar, Vagar e Investigar, com suas transições internas. Dentro de "Combate", uma submáquina com os subestados Atirar, Avançar, Recarregar e Corpo a corpo, com transições internas. Fora e acima dos dois superestados, um estado simples "Fugir". Setas de nível superior: de "Pacífico" para "Combate" (rótulo: "vê o jogador"); de "Combate" para "Pacífico" (rótulo: "perdeu o alvo"); e — crucial — uma seta partindo da *borda* do superestado "Combate" (não de um subestado específico) para "Fugir", rotulada "vida < 20% (transição herdada por todos os subestados de Combate)". Marcar o subestado inicial de cada superestado com uma seta de entrada solta. Uma legenda destaca: "a transição na borda do superestado vale para todos os seus subestados".
 Elementos obrigatórios: dois superestados como caixas contendo submáquinas; subestados internos com transições; transição comum ancorada na borda do superestado; estado externo Fugir; marcação dos subestados iniciais; legenda explicando a herança.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Pacifico
+    state "PACÍFICO" as Pacifico {
+        [*] --> Patrulhar
+        Patrulhar --> Vagar
+        Vagar --> Patrulhar
+        Patrulhar --> Investigar
+        Investigar --> Patrulhar
+    }
+    state "COMBATE" as Combate {
+        [*] --> Atirar
+        Atirar --> Recarregar
+        Recarregar --> Atirar
+        Atirar --> Avancar
+        Avancar --> CorpoACorpo
+    }
+    Pacifico --> Combate: vê o jogador
+    Combate --> Pacifico: perdeu o alvo
+    Combate --> Fugir: vida < 20%\n(herdada por todos os subestados)
+```
 [/DIAGRAMA]
 
 ---

@@ -148,6 +148,20 @@ Título: O ciclo de expansão do A\* com listas aberta e fechada
 Objetivo pedagógico: Ilustrar o laço central do algoritmo — retirar o menor f da lista aberta, expandir vizinhos, relaxar arestas e mover para a lista fechada.
 Descrição detalhada: Desenhar um fluxograma vertical. Caixa 1: "Lista aberta vazia? → se sim, FALHA (destino inalcançável)". Caixa 2: "Retirar da lista aberta o nó ATUAL de menor f". Losango de decisão: "ATUAL é o destino? → se sim, RECONSTRUIR CAMINHO e terminar". Caixa 3: "Mover ATUAL para a lista fechada". Caixa 4: "Para cada vizinho de ATUAL não fechado: calcular custoTentativa = g(atual) + custo(atual,vizinho)". Losango: "custoTentativa < g(vizinho)? → se sim: atualizar g, f e predecessor; inserir vizinho na lista aberta". Seta de retorno da última caixa de volta à Caixa 1, formando o laço. Ao lado do fluxograma, duas colunas visuais representando o estado das listas (Aberta = fronteira; Fechada = resolvidos) com alguns nós de exemplo.
 Elementos obrigatórios: laço fechado; retirada do menor f; teste de destino; movimentação para a fechada; relaxamento condicional dos vizinhos; representação lateral das duas listas.
+
+```mermaid
+flowchart TD
+    A{Lista aberta vazia?} -->|Sim| F[FALHA: destino inalcançável]
+    A -->|Não| B[Retirar da lista aberta o nó ATUAL de menor f]
+    B --> C{ATUAL é o destino?}
+    C -->|Sim| D[Reconstruir caminho e terminar]
+    C -->|Não| E[Mover ATUAL para a lista fechada]
+    E --> G["Para cada vizinho não fechado:<br/>custoTentativa = g(atual) + custo(atual,vizinho)"]
+    G --> H{"custoTentativa < g(vizinho)?"}
+    H -->|Sim| I[Atualizar g, f e predecessor;<br/>inserir vizinho na lista aberta]
+    H -->|Não| A
+    I --> A
+```
 [/DIAGRAMA]
 
 ### 8.3.2 Heurísticas comuns (Manhattan, Euclidiana, Chebyshev)

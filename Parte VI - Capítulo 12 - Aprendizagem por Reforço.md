@@ -146,6 +146,18 @@ Título: Vocabulário fundamental da Aprendizagem por Reforço
 Objetivo pedagógico: Fixar, em um único quadro de referência, todos os conceitos-base e como se relacionam, antes de apresentar qualquer algoritmo.
 Descrição detalhada: Um grande retângulo dividido em dois blocos ligados por setas circulares. Bloco esquerdo rotulado "AGENTE" (com um subtítulo "aprende e decide"), contendo uma caixa interna "Política π: estado → ação". Bloco direito rotulado "AMBIENTE" (subtítulo "mundo do jogo"). Do agente para o ambiente, uma seta larga rotulada "Ação (aₜ)". Do ambiente de volta para o agente, DUAS setas paralelas: uma rotulada "Novo estado (sₜ₊₁)" e outra rotulada "Recompensa (rₜ₊₁)". Abaixo do laço, uma linha do tempo horizontal mostrando uma sequência s₀→a₀→r₁→s₁→a₁→r₂→...→sₜ (terminal), com um colchete abarcando toda a sequência rotulado "EPISÓDIO" e, sob ele, a fórmula em texto simples "Retorno = r₁ + γ·r₂ + γ²·r₃ + ... (γ = fator de desconto)". Em um canto, uma pequena legenda de balança com "Explorar ↔ Exploitation" indicando o dilema na escolha da ação.
 Elementos obrigatórios: os rótulos agente, ambiente, ação, estado, recompensa, política, episódio, retorno, fator de desconto e o dilema explorar/*exploitation*; o laço fechado agente↔ambiente; a linha do tempo de um episódio.
+
+```mermaid
+flowchart LR
+    subgraph Agente["AGENTE (aprende e decide)"]
+        Pi["Política π: estado → ação"]
+    end
+    subgraph Ambiente["AMBIENTE (mundo do jogo)"]
+    end
+    Agente -->|"Ação (aₜ)"| Ambiente
+    Ambiente -->|"Novo estado (sₜ₊₁)"| Agente
+    Ambiente -->|"Recompensa (rₜ₊₁)"| Agente
+```
 [/DIAGRAMA]
 
 ---
@@ -178,6 +190,15 @@ Título: O ciclo de aprendizagem por reforço
 Objetivo pedagógico: Mostrar o laço iterativo observação → decisão → ação → recompensa → atualização como um processo cíclico contínuo.
 Descrição detalhada: Um diagrama circular com cinco nós dispostos em círculo, ligados por setas no sentido horário, formando um laço fechado. Nó 1 (topo): "Observar estado s". Nó 2: "Decidir ação a (explorar ou fazer exploitation)". Nó 3: "Executar a no ambiente". Nó 4: "Receber recompensa r e novo estado s′". Nó 5: "Atualizar conhecimento (valor da ação)". A seta do nó 5 retorna ao nó 1, agora com "s ← s′", fechando o ciclo. Ao lado do círculo, uma seta externa grande rotulada "× milhares de episódios" indicando a repetição em larga escala. Em destaque, o nó 5 deve ter uma cor diferente, com a legenda "aqui ocorre o aprendizado".
 Elementos obrigatórios: os cinco passos nomeados; o sentido cíclico; a substituição s ← s′; a indicação de repetição massiva; o destaque para o passo de atualização como o momento do aprendizado.
+
+```mermaid
+flowchart LR
+    A["1. Observar estado s"] --> B["2. Decidir ação a<br/>(explorar ou exploitation)"]
+    B --> C["3. Executar a no ambiente"]
+    C --> D["4. Receber recompensa r<br/>e novo estado s′"]
+    D --> E["5. Atualizar conhecimento<br/>(aqui ocorre o aprendizado)"]
+    E -->|"s ← s′ — × milhares de episódios"| A
+```
 [/DIAGRAMA]
 
 ---
@@ -224,6 +245,16 @@ Título: Estrutura de um Processo de Decisão de Markov (MDP)
 Objetivo pedagógico: Visualizar estados, ações, transições probabilísticas e recompensas como um grafo, e ilustrar a propriedade de Markov.
 Descrição detalhada: Um pequeno grafo com três ou quatro estados representados por círculos (S0, S1, S2, S3), sendo S3 marcado como terminal (círculo duplo). De S0 saem duas ações, representadas por pequenos nós quadrados rotulados "a1" e "a2". De cada nó de ação partem setas para estados de destino, rotuladas com probabilidade e recompensa — por exemplo, de "a1" duas setas: "p=0,8; r=+1 → S1" e "p=0,2; r=0 → S2" (ilustrando transição estocástica); de "a2" uma seta "p=1,0; r=−1 → S2". De S1 uma ação leva a S3 com "r=+100" (recompensa terminal grande). Um balão de destaque sobre S1 diz: "Propriedade de Markov: o que acontece a partir daqui depende SÓ de S1, não de como chegamos até ele". Legenda explicando que círculos = estados, quadrados = ações, setas = transições com probabilidade e recompensa.
 Elementos obrigatórios: estados (incluindo um terminal), ações, transições com probabilidade e recompensa, ao menos uma transição estocástica (probabilidades somando 1), e a anotação da propriedade de Markov.
+
+```mermaid
+flowchart LR
+    S0((S0)) --> a1{{a1}}
+    S0 --> a2{{a2}}
+    a1 -->|p=0,8 r=+1| S1((S1))
+    a1 -->|p=0,2 r=0| S2((S2))
+    a2 -->|p=1,0 r=−1| S2
+    S1 -->|r=+100| S3(((S3 terminal)))
+```
 [/DIAGRAMA]
 
 ---

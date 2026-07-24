@@ -64,6 +64,16 @@ Título: Anatomia de um grafo de navegação
 Objetivo pedagógico: Fixar visualmente os quatro elementos fundamentais — vértice, aresta, peso e direção — em um único diagrama de referência.
 Descrição detalhada: Desenhar de cinco a seis vértices como círculos rotulados (A, B, C, D, E, F) espalhados como um pequeno mapa. Ligá-los por arestas: a maioria como linhas simples de mão dupla, com um número sobre cada linha indicando o peso (por exemplo, A–B custo 1, B–C custo 4 atravessando um "pântano" sombreado, C–D custo 1). Incluir pelo menos uma aresta direcionada, desenhada como seta de sentido único (por exemplo, E→F, rotulada "queda: só descida"). Sombrear a região entre B e C para justificar visualmente o custo maior. Uma legenda lateral deve associar: círculo = vértice/nó (lugar); linha = aresta (conexão direta); número sobre a linha = peso/custo; seta = aresta direcionada (mão única).
 Elementos obrigatórios: vértices rotulados; arestas com pesos numéricos; pelo menos uma aresta direcionada com seta; uma região de custo elevado destacada; legenda dos quatro conceitos.
+
+```mermaid
+graph LR
+    A((A)) ---|1| B((B))
+    B ---|4 — pântano| C((C))
+    C ---|1| D((D))
+    D ---|2| A
+    E((E)) -->|"queda: só descida"| F((F))
+    D ---|1| E
+```
 [/DIAGRAMA]
 
 ### 7.2.2 Custo, conectividade e representação em memória

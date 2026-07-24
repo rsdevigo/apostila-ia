@@ -116,6 +116,20 @@ Título: Anatomia de uma árvore de jogo
 Objetivo pedagógico: Consolidar visualmente todos os elementos definidos na Seção 11.2 (estado, ação, profundidade, ramificação, folha, utilidade) em uma única figura de referência, usando um exemplo pequeno.
 Descrição detalhada: Uma árvore de três níveis desenhada de cima para baixo, com um jogo simples e abstrato. No topo, um único nó rotulado "RAIZ — estado atual (vez de MAX), profundidade 0". Dele saem 3 ramos rotulados "ações (jogadas legais)", levando a 3 nós de profundidade 1 (rotulados "vez de MIN"). De cada um desses, saem 2 ramos até nós de profundidade 2, alguns marcados como folhas terminais com valores de utilidade (+1, 0, −1) e outros marcados com um símbolo de "?" indicando nós não-terminais que precisariam de função de avaliação se a busca parasse ali. Anotações laterais: uma chave indicando "fator de ramificação b ≈ 3 no topo, 2 no nível seguinte"; uma régua vertical à esquerda marcando "profundidade 0, 1, 2 (plies)"; destaque nas folhas: "utilidade: +1 vitória MAX, 0 empate, −1 derrota MAX".
 Elementos obrigatórios: raiz identificada como estado atual; ramos rotulados como ações; níveis alternando MAX/MIN; folhas terminais com utilidade; pelo menos um nó não-terminal marcado com "?"; escala de profundidade/plies; indicação do fator de ramificação.
+
+```mermaid
+flowchart TD
+    Root["RAIZ — estado atual (vez de MAX)<br/>profundidade 0"]
+    Root -->|ação 1| M1["vez de MIN<br/>profundidade 1"]
+    Root -->|ação 2| M2["vez de MIN<br/>profundidade 1"]
+    Root -->|ação 3| M3["vez de MIN<br/>profundidade 1"]
+    M1 --> L1["folha: utilidade +1"]
+    M1 --> L2["não-terminal: ?"]
+    M2 --> L3["folha: utilidade 0"]
+    M2 --> L4["folha: utilidade −1"]
+    M3 --> L5["folha: utilidade +1"]
+    M3 --> L6["não-terminal: ?"]
+```
 [/DIAGRAMA]
 
 Com esses fundamentos — soma zero, turnos, árvore de jogo, estados, ações, profundidade, ramificação, utilidade e função de avaliação — temos todo o vocabulário necessário. Estamos prontos para o algoritmo que dá nome ao capítulo.
@@ -206,6 +220,20 @@ Título: Propagação de valores no Minimax (árvore de 2 plies)
 Objetivo pedagógico: Mostrar, com o exemplo numérico da seção, como os valores sobem das folhas até a raiz, alternando min e max, e por que a jogada A é escolhida apesar de B conter a maior folha.
 Descrição detalhada: Árvore de três níveis. Topo: nó MAX (triângulo apontando para cima) rotulado "raiz — MAX". Três ramos rotulados A, B, C descem para três nós MIN (triângulos apontando para baixo). Cada nó MIN tem dois filhos-folha: sob A as folhas 3 e 5; sob B as folhas 6 e 2; sob C as folhas 1 e 8. Anotar em cada nó MIN o valor calculado (A→3, B→2, C→1) com uma seta indicando qual folha foi escolhida (a menor). No topo, anotar a raiz = 3, com a seta destacando o ramo A como a jogada escolhida. Destacar visualmente (por exemplo, com um X ou sombreado) a folha 6 sob B, com a legenda "MIN nunca deixa MAX chegar aqui". Usar cores distintas para camadas MAX (azul) e MIN (vermelho).
 Elementos obrigatórios: triângulos MAX/MIN distinguindo as camadas; as seis folhas com os valores dados; os valores propagados nos nós MIN e na raiz; a jogada A destacada; a folha 6 marcada como inalcançável.
+
+```mermaid
+flowchart TD
+    Root["MAX — raiz = 3<br/>jogada escolhida: A"]
+    Root -->|A escolhida| MinA["MIN = 3"]
+    Root -->|B| MinB["MIN = 2"]
+    Root -->|C| MinC["MIN = 1"]
+    MinA --> LA1["3"]
+    MinA --> LA2["5"]
+    MinB --> LB1["6 — MIN nunca deixa MAX chegar aqui"]
+    MinB --> LB2["2"]
+    MinC --> LC1["1"]
+    MinC --> LC2["8"]
+```
 [/DIAGRAMA]
 
 ### 11.3.1 Camadas MAX e MIN
@@ -273,6 +301,19 @@ Título: Como a função de avaliação preenche o horizonte
 Objetivo pedagógico: Mostrar que, na busca limitada, os nós da fronteira de profundidade recebem valores da função heurística (não da utilidade), e que esses valores são o que sobe pela árvore.
 Descrição detalhada: Uma árvore de jogo desenhada até a profundidade d=3. Os nós dos níveis 0 a 2 são internos (MAX/MIN alternando). Na profundidade 3 (a fronteira), em vez de folhas terminais com utilidade, mostram-se nós rotulados "não-terminal — jogo continua", cada um recebendo um valor de uma "caixa" lateral rotulada "FUNÇÃO DE AVALIAÇÃO" que lista features (material, centro, segurança do rei) sendo somadas com pesos. Setas dessa caixa apontando para os nós da fronteira, atribuindo-lhes valores numéricos (ex.: +2, −1, +3...). Depois, setas de propagação subindo (min/max) até a raiz. Contraste: em um canto, um pequeno nó marcado "folha REAL (xeque-mate) → utilidade +∞", para distinguir avaliação de utilidade.
 Elementos obrigatórios: fronteira de profundidade d recebendo valores da função de avaliação; a caixa de features com soma ponderada; propagação min/max até a raiz; distinção visual entre "avaliação" (fronteira) e "utilidade" (folha terminal real).
+
+```mermaid
+flowchart TD
+    Root["MAX raiz"] --> N1["MIN"]
+    Root --> N2["MIN"]
+    N1 --> F1["MAX — fronteira, d=3<br/>avaliação = +2"]
+    N1 --> F2["MAX — fronteira, d=3<br/>avaliação = −1"]
+    N2 --> F3["MAX — fronteira, d=3<br/>avaliação = +3"]
+    N2 --> F4["folha REAL (xeque-mate)<br/>utilidade = +∞"]
+    Eval["FUNÇÃO DE AVALIAÇÃO<br/>material + centro + segurança do rei<br/>(soma ponderada)"] -.-> F1
+    Eval -.-> F2
+    Eval -.-> F3
+```
 [/DIAGRAMA]
 
 ---
@@ -358,6 +399,34 @@ Título: Minimax completo versus alfa-beta (árvore podada)
 Objetivo pedagógico: Comparar lado a lado a árvore que o Minimax puro examina inteiramente e a mesma árvore com os ramos que a poda alfa-beta descarta, tornando visível a economia.
 Descrição detalhada: Duas cópias da mesma árvore de jogo (3 níveis, com o exemplo A/B/C e folhas 3,5,6,2,1,8), lado a lado. À esquerda, rótulo "MINIMAX — examina TODOS os nós": todas as folhas e ramos desenhados em cor cheia. À direita, rótulo "ALFA-BETA — mesma decisão, menos trabalho": a mesma árvore, mas com a segunda folha de C (o valor 8) e quaisquer ramos à direita dos cortes desenhados apagados/tracejados em cinza, marcados com uma tesoura ✂ e a etiqueta "PODADO — não examinado". Anotar em cada nó os valores de α e β no momento do corte (ex.: no nó MIN sob C, "α=3, valor parcial=1 ≤ α ⇒ corte"). Embaixo, uma barra comparando "nós examinados: 6 (Minimax) × 5 (alfa-beta)" com nota "em árvores reais, a economia chega a b^{d/2}".
 Elementos obrigatórios: as duas árvores idênticas; ramos podados destacados (tracejado + tesoura) na versão alfa-beta; valores de α/β anotados nos pontos de corte; a mesma raiz = 3 e jogada A em ambas; indicação da economia de nós.
+
+```mermaid
+flowchart LR
+    subgraph MM["MINIMAX — examina TODOS os nós (6 folhas)"]
+        direction TB
+        R1["MAX = 3"] --> A1["MIN A = 3"]
+        R1 --> B1["MIN B = 2"]
+        R1 --> C1["MIN C = 1"]
+        A1 --> A1a[3]
+        A1 --> A1b[5]
+        B1 --> B1a[6]
+        B1 --> B1b[2]
+        C1 --> C1a[1]
+        C1 --> C1b[8]
+    end
+    subgraph AB["ALFA-BETA — mesma decisão, 5 folhas examinadas"]
+        direction TB
+        R2["MAX = 3"] --> A2["MIN A = 3"]
+        R2 --> B2["MIN B = 2"]
+        R2 --> C2["MIN C = 1"]
+        A2 --> A2a[3]
+        A2 --> A2b[5]
+        B2 --> B2a[6]
+        B2 --> B2b[2]
+        C2 --> C2a[1]
+        C2 -.->|"PODADO: α=3, parcial=1 ≤ α"| C2b["8 (não examinado)"]
+    end
+```
 [/DIAGRAMA]
 
 ---
@@ -410,6 +479,14 @@ Título: As quatro fases do MCTS
 Objetivo pedagógico: Mostrar o ciclo seleção → expansão → simulação → retropropagação de uma iteração do MCTS, evidenciando o crescimento assimétrico da árvore.
 Descrição detalhada: Quatro quadros em sequência, cada um mostrando a mesma árvore parcial de MCTS em um estágio. Quadro 1 ("Seleção"): a partir da raiz, uma seta desce por nós já existentes seguindo os de maior valor UCT, até um nó de fronteira; nós anotados com estatísticas "vitórias/visitas" (ex.: 7/10, 3/8). Quadro 2 ("Expansão"): um novo nó-filho (destacado em verde) é adicionado à fronteira. Quadro 3 ("Simulação"): a partir do novo nó, uma linha ondulada/tracejada rápida desce até um símbolo de fim de jogo (bandeira) com resultado "VITÓRIA" ou "DERROTA", rotulada "playout aleatório até o fim". Quadro 4 ("Retropropagação"): setas subindo do nó novo até a raiz, com as estatísticas "vitórias/visitas" sendo atualizadas em cada nó do caminho (ex.: 7/10 → 8/11). Abaixo dos quatro quadros, a legenda "repetir milhares de vezes; ao final, jogar o filho da raiz mais visitado". Contrastar, num cantinho, com um selo "sem função de avaliação — só regras + estatística".
 Elementos obrigatórios: os quatro quadros rotulados; estatísticas vitórias/visitas nos nós; o playout até um estado terminal; a atualização retropropagada; a nota de repetição e escolha final; o crescimento assimétrico (a árvore mais funda no ramo promissor).
+
+```mermaid
+flowchart LR
+    Sel["1. Seleção<br/>desce pelos nós de maior UCT<br/>até a fronteira (ex.: 7/10 → 3/8)"] --> Exp["2. Expansão<br/>adiciona novo nó-filho"]
+    Exp --> Sim["3. Simulação<br/>playout aleatório até o fim<br/>(vitória ou derrota)"]
+    Sim --> Retro["4. Retropropagação<br/>atualiza vitórias/visitas<br/>de volta até a raiz"]
+    Retro -.->|repetir milhares de vezes| Sel
+```
 [/DIAGRAMA]
 
 ---

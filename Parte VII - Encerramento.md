@@ -70,6 +70,17 @@ Título: Estrutura do relatório final do Projeto Integrador
 Objetivo pedagógico: Padronizar o produto final e reforçar a separação entre fato, hipótese e indeterminação.
 Descrição detalhada: Um documento esquematizado em blocos verticais, na ordem: (1) Capa e pergunta de pesquisa; (2) Metodologia (como observou, quantas repetições, condições); (3) Fatos observados [Documentado/observação direta] — tabelas estímulo→resposta e medições; (4) Hipóteses [Inferência] — cada uma com evidência, nível de confiança e conceito da apostila relacionado (Parte/Capítulo); (5) Confronto com documentação oficial, se houver; (6) O que ficou indeterminado [Especulação]; (7) Diagrama do comportamento/percepção inferido; (8) Conclusões e referências. Uma coluna lateral atravessa os blocos 3–6 com os rótulos coloridos [Documentado]/[Inferência]/[Especulação], indicando que cada afirmação deve carregar seu rótulo.
 Elementos obrigatórios: os oito blocos na ordem indicada; a coluna lateral dos três rótulos de certeza; destaque para o vínculo explícito entre cada hipótese e um conceito da apostila.
+
+```mermaid
+flowchart TD
+    B1["1. Capa e pergunta de pesquisa"] --> B2["2. Metodologia<br/>como observou, repetições, condições"]
+    B2 --> B3["3. Fatos observados [Documentado]<br/>tabelas estímulo→resposta, medições"]
+    B3 --> B4["4. Hipóteses [Inferência]<br/>evidência + confiança + conceito da apostila"]
+    B4 --> B5["5. Confronto com documentação oficial<br/>(se houver)"]
+    B5 --> B6["6. O que ficou indeterminado [Especulação]"]
+    B6 --> B7["7. Diagrama do comportamento/percepção inferido"]
+    B7 --> B8["8. Conclusões e referências"]
+```
 [/DIAGRAMA]
 
 ### Critérios de avaliação sugeridos

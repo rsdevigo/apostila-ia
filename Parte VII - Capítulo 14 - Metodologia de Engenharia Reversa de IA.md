@@ -55,6 +55,14 @@ Título: O problema da caixa-preta na IA de jogos
 Objetivo pedagógico: Fixar visualmente que a engenharia reversa parte do comportamento observável (saída) para inferir o mecanismo interno (oculto).
 Descrição detalhada: Uma caixa retangular central, opaca e cinza, rotulada "IA DO JOGO (código fechado)". À esquerda, entrando na caixa, setas rotuladas "ENTRADAS observáveis" — estado do jogo, ações do jogador, posição, ruídos, tempo. À direita, saindo da caixa, setas rotuladas "SAÍDAS observáveis" — comportamento do NPC, animações, escolhas, movimentos, falas. Acima da caixa, um ponto de interrogação grande e a legenda "O que há aqui dentro? FSM? BT? GOAP? Utility? Pathfinding?". Abaixo, uma seta curva ligando as saídas de volta a um bloco rotulado "OBSERVADOR (engenheiro reverso): observa, registra, isola variáveis, formula hipóteses". Uma seta tracejada vai do OBSERVADOR de volta à caixa, rotulada "hipótese (nunca certeza)".
 Elementos obrigatórios: caixa-preta central rotulada; setas de entrada e de saída observáveis; ponto de interrogação sobre o interior; bloco do observador; seta tracejada de hipótese indicando incerteza.
+
+```mermaid
+flowchart LR
+    In["ENTRADAS observáveis<br/>estado do jogo, ações do jogador,<br/>posição, ruídos, tempo"] --> Box["IA DO JOGO (código fechado)<br/>❓ FSM? BT? GOAP? Utility? Pathfinding?"]
+    Box --> Out["SAÍDAS observáveis<br/>comportamento do NPC, animações,<br/>escolhas, movimentos, falas"]
+    Out --> Obs["OBSERVADOR (engenheiro reverso)<br/>observa, registra, isola variáveis,<br/>formula hipóteses"]
+    Obs -.->|"hipótese (nunca certeza)"| Box
+```
 [/DIAGRAMA]
 
 ---
@@ -83,6 +91,16 @@ Título: Fluxo da observação sistemática
 Objetivo pedagógico: Apresentar a observação como um laço metódico, e não como um olhar passivo.
 Descrição detalhada: Um ciclo fechado com cinco caixas ligadas por setas em sentido horário. (1) "Montar cena controlada" — ambiente simples, um NPC, condições conhecidas. (2) "Aplicar estímulo isolado" — uma única variável por vez. (3) "Observar e registrar resposta" — anotações, vídeo, captura. (4) "Repetir" — várias vezes o mesmo estímulo, com uma seta curta que retorna ao passo 2. (5) "Comparar respostas" — determinístico × variável; atribuir efeito à causa. Do passo 5 sai uma seta rotulada "→ evidência consolidada" que aponta para fora do ciclo, em direção à seção 14.3 (formular hipóteses). Uma nota lateral: "Mudar UMA variável de cada vez".
 Elementos obrigatórios: as cinco etapas nomeadas; o laço de repetição destacado; a saída para "evidência consolidada"; a nota sobre isolamento de variáveis.
+
+```mermaid
+flowchart LR
+    A["1. Montar cena controlada"] --> B["2. Aplicar estímulo isolado"]
+    B --> C["3. Observar e registrar resposta"]
+    C --> D["4. Repetir"]
+    D -.-> B
+    D --> E["5. Comparar respostas<br/>determinístico × variável"]
+    E -->|evidência consolidada| F["seção 14.3 — formular hipóteses"]
+```
 [/DIAGRAMA]
 
 ### 14.2.2 Estímulo e resposta
@@ -144,6 +162,24 @@ Título: Árvore de decisão para identificação de técnicas
 Objetivo pedagógico: Oferecer um roteiro de triagem que conduz o analista, por perguntas, à família de técnicas mais provável.
 Descrição detalhada: Um fluxograma em forma de árvore, lido de cima para baixo, com perguntas nos nós e famílias de técnicas nas folhas. Nó raiz: "O comportamento muda de forma persistente com a experiência ao longo de várias partidas?" — SIM → folha "Aprendizado real (Parte VI) — raro; exigir evidência forte"; NÃO → próximo nó. Nó 2: "É um jogo de tabuleiro/turnos com oponente que antecipa jogadas?" — SIM → folha "Minimax / busca adversarial (Parte V)"; NÃO → próximo nó. Nó 3: "As decisões dependem da distribuição de forças no mapa (estratégia espacial)?" — SIM → folha "Mapas de influência (Parte IV)"; NÃO → próximo nó. Nó 4: "O agente monta sequências variáveis de ações com pré-condições para atingir um objetivo?" — SIM → folha "GOAP (planejamento)"; NÃO → próximo nó. Nó 5: "As decisões são graduadas, ponderando várias necessidades concorrentes simultâneas?" — SIM → folha "Utility AI"; NÃO → próximo nó. Nó 6: "Dá para enumerar poucos modos discretos com transições por eventos claros?" — SIM, e há modos aninhados → folha "HFSM"; SIM, sem aninhamento → folha "FSM / Behavior Tree"; NÃO → folha "Sistema híbrido/indeterminado — reobservar". Nota lateral em todas as folhas: "Pathfinding (Parte III) quase sempre coexiste, se há navegação." Rodapé do diagrama: "Toda folha é uma HIPÓTESE, não uma certeza."
 Elementos obrigatórios: nó raiz sobre aprendizado; a cadeia de perguntas na ordem indicada; folhas nomeadas por família de técnica; nota sobre pathfinding coexistente; rodapé reforçando o caráter hipotético.
+
+```mermaid
+flowchart TD
+    Q1{"O comportamento muda de forma<br/>persistente com a experiência?"}
+    Q1 -->|Sim| A1["Aprendizado real (Parte VI)<br/>raro — exigir evidência forte"]
+    Q1 -->|Não| Q2{"Jogo de tabuleiro/turnos com<br/>oponente que antecipa jogadas?"}
+    Q2 -->|Sim| A2["Minimax / busca adversarial (Parte V)"]
+    Q2 -->|Não| Q3{"Decisões dependem da distribuição<br/>de forças no mapa?"}
+    Q3 -->|Sim| A3["Mapas de influência (Parte IV)"]
+    Q3 -->|Não| Q4{"Agente monta sequências variáveis<br/>de ações com pré-condições?"}
+    Q4 -->|Sim| A4["GOAP — planejamento"]
+    Q4 -->|Não| Q5{"Decisões graduadas, ponderando<br/>necessidades concorrentes?"}
+    Q5 -->|Sim| A5["Utility AI"]
+    Q5 -->|Não| Q6{"Poucos modos discretos com<br/>transições por eventos claros?"}
+    Q6 -->|"Sim, com aninhamento"| A6["HFSM"]
+    Q6 -->|"Sim, sem aninhamento"| A7["FSM / Behavior Tree"]
+    Q6 -->|Não| A8["Sistema híbrido/indeterminado<br/>— reobservar"]
+```
 [/DIAGRAMA]
 
 ---
@@ -181,6 +217,16 @@ Título: Roteiro reutilizável de engenharia reversa de IA (seis etapas)
 Objetivo pedagógico: Fornecer o processo completo em um único quadro, servindo de checklist para o Projeto Integrador.
 Descrição detalhada: Um fluxo linear com seis blocos numerados, ligados por setas da esquerda para a direita (ou de cima para baixo), com um laço de retorno importante. (1) DEFINIÇÃO DO PROBLEMA — escopo estreito + pergunta de pesquisa + levantamento de fontes existentes. (2) COLETA DE EVIDÊNCIAS — cenas controladas, estímulos isolados, repetição, gravação. (3) REGISTRO DAS OBSERVAÇÕES — tabelas estímulo→resposta, lista de modos, medições. (4) FORMULAÇÃO DE HIPÓTESES — várias hipóteses concorrentes, cada uma com nível de confiança e evidência; navalha de Occam. (5) VALIDAÇÃO — experimentos que tentam REFUTAR cada hipótese; confronto com documentação oficial. (6) DOCUMENTAÇÃO — separar fatos × hipóteses × indeterminado; citar fontes. Uma seta de retorno tracejada vai do bloco 5 de volta ao bloco 2, rotulada "se a hipótese cai, coletar novas evidências". Faixa inferior atravessando todos os blocos: "Princípio constante: hipótese ≠ confirmação; registrar sempre o nível de confiança".
 Elementos obrigatórios: os seis blocos nomeados e numerados; o laço de retorno da validação para a coleta; a faixa inferior com o princípio da incerteza; destaque na etapa 5 para "tentar refutar".
+
+```mermaid
+flowchart LR
+    S1["1. Definição do problema<br/>escopo + pergunta de pesquisa"] --> S2["2. Coleta de evidências<br/>cenas controladas, estímulos isolados"]
+    S2 --> S3["3. Registro das observações<br/>tabelas estímulo→resposta"]
+    S3 --> S4["4. Formulação de hipóteses<br/>múltiplas + nível de confiança"]
+    S4 --> S5["5. Validação<br/>tentar REFUTAR cada hipótese"]
+    S5 --> S6["6. Documentação<br/>fatos × hipóteses × indeterminado"]
+    S5 -.->|se a hipótese cai| S2
+```
 [/DIAGRAMA]
 
 > 🎮 **Na Prática**

@@ -30,6 +30,16 @@ Título: A coevolução de hardware e técnicas de IA de jogos
 Objetivo pedagógico: Mostrar que cada salto de capacidade do hardware habilitou novas famílias de técnicas de IA, evidenciando a relação de causa e efeito.
 Descrição detalhada: Um gráfico de duas faixas paralelas ao longo de um eixo temporal horizontal (dos anos 1970 aos anos 2020). Faixa superior "HARDWARE": marcos como "arcades (KB de memória)", "consoles 8/16 bits", "PCs anos 1990", "consoles 3D anos 2000", "hardware multinúcleo e GPU", "computação em nuvem / GPUs para ML". Faixa inferior "TÉCNICAS DE IA DE JOGOS", alinhada temporalmente: "padrões de movimento", "máquinas de estado e scripts", "pathfinding A*", "árvores de comportamento e GOAP", "aprendizado de máquina e IA procedural orientada a dados". Setas verticais ligam cada avanço de hardware às técnicas que ele habilitou.
 Elementos que devem aparecer: eixo temporal; duas faixas paralelas (hardware e técnicas); setas verticais de habilitação; marcos rotulados em ambas as faixas.
+
+```mermaid
+timeline
+    title Coevolução de hardware e técnicas de IA de jogos
+    Anos 1970 : Arcades (KB de memória) : Padrões de movimento
+    Anos 1980 : Consoles 8/16 bits : Máquinas de estado e scripts
+    Anos 1990 : PCs / consoles 3D : Pathfinding A*
+    Anos 2000 : Hardware multinúcleo e GPU : Árvores de comportamento e GOAP
+    Anos 2010-2020 : Nuvem e GPUs para ML : Aprendizado de máquina e IA procedural
+```
 [/DIAGRAMA]
 
 > 🎲 **Curiosidade**

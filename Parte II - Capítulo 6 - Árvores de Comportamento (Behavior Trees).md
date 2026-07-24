@@ -51,6 +51,24 @@ Título: Os três nós compostos fundamentais
 Objetivo pedagógico: Fixar a semântica de Sequência, Seletor e Paralelo, evidenciando como cada um reage aos estados de retorno dos filhos.
 Descrição detalhada: Três mini-árvores lado a lado, cada uma com um nó composto no topo e três folhas abaixo. (A) SEQUÊNCIA (símbolo "→"): setas indicando execução da esquerda para a direita; anotação "falha em qualquer filho → sequência falha; todos com sucesso → sucesso". Exemplo nas folhas: "Ir até a porta → Abrir a porta → Atravessar". (B) SELETOR (símbolo "?"): execução da esquerda para a direita até o primeiro sucesso; anotação "sucesso em qualquer filho → seletor tem sucesso; todos falham → falha". Exemplo: "Atirar à distância ? Corpo a corpo ? Fugir". (C) PARALELO (símbolo "⇉"): as três folhas executadas simultaneamente; anotação "estado de retorno conforme política (todos/qualquer)". Exemplo: "Atirar ⇉ Mover para cobertura ⇉ Gritar alerta". Usar cores para os estados de retorno (verde=sucesso, vermelho=falha, azul=em execução) numa pequena legenda.
 Elementos obrigatórios: três nós compostos com seus símbolos; folhas de exemplo; anotações da semântica de cada um; legenda dos estados de retorno.
+
+```mermaid
+flowchart TB
+    subgraph SEQ["SEQUÊNCIA (→) — falha em qualquer filho: falha"]
+        direction LR
+        S1[Ir até a porta] --> S2[Abrir a porta] --> S3[Atravessar]
+    end
+    subgraph SEL["SELETOR (?) — sucesso em qualquer filho: sucesso"]
+        direction LR
+        L1[Atirar à distância] -.-> L2[Corpo a corpo] -.-> L3[Fugir]
+    end
+    subgraph PAR["PARALELO (⇉) — retorno conforme política"]
+        direction LR
+        P1[Atirar]
+        P2[Mover para cobertura]
+        P3[Gritar alerta]
+    end
+```
 [/DIAGRAMA]
 
 > ✅ **Boa Prática**
@@ -88,6 +106,25 @@ Título: Árvore de comportamento e blackboard
 Objetivo pedagógico: Mostrar como os nós de uma BT se comunicam indiretamente por meio do blackboard, mantendo o desacoplamento.
 Descrição detalhada: À esquerda, uma árvore de comportamento simples (um seletor-raiz com duas subárvores: "Combater" e "Patrulhar"). À direita, um retângulo rotulado "BLACKBOARD" listando pares chave→valor: "alvo → Jogador", "últimaPosiçãoVista → (x,y,z)", "munição → 3", "emAlerta → verdadeiro". Setas tracejadas ligam nós específicos ao blackboard: a condição "Vejo o jogador?" com uma seta de *escrita* para "últimaPosiçãoVista"; a ação "Ir até última posição" com uma seta de *leitura* de "últimaPosiçãoVista"; a condição "Tenho munição?" com seta de leitura de "munição". Rotular as setas como "lê" e "escreve". Uma nota lateral: "os nós não se comunicam diretamente — apenas através do blackboard".
 Elementos obrigatórios: árvore de comportamento à esquerda; blackboard com pares chave→valor à direita; setas de leitura e escrita entre nós e chaves; nota sobre desacoplamento.
+
+```mermaid
+flowchart LR
+    subgraph BT["Árvore de Comportamento"]
+        Root{{"Seletor raiz"}} --> Combater["Combater"]
+        Root --> Patrulhar["Patrulhar"]
+        Combater --> Vejo["Vejo o jogador?"]
+        Combater --> Ir["Ir até última posição vista"]
+        Combater --> Muni["Tenho munição?"]
+    end
+    subgraph BB["BLACKBOARD"]
+        K1["alvo → Jogador"]
+        K2["últimaPosiçãoVista → (x,y,z)"]
+        K3["munição → 3"]
+    end
+    Vejo -. escreve .-> K2
+    Ir -. lê .-> K2
+    Muni -. lê .-> K3
+```
 [/DIAGRAMA]
 
 > ⚠️ **Atenção**
@@ -208,6 +245,15 @@ Título: Planejamento GOAP — do objetivo ao plano
 Objetivo pedagógico: Ilustrar como o planejador encadeia ações casando efeitos e pré-condições para montar uma sequência que atinge o objetivo.
 Descrição detalhada: No alto, uma caixa "OBJETIVO: jogador morto". Abaixo, um pequeno grafo de ações, cada uma como um bloco com três compartimentos (pré-condições / nome da ação / efeitos). Blocos: "Atacar" (pré: arma carregada, vejo alvo | efeito: jogador morto); "Recarregar" (pré: tenho munição | efeito: arma carregada); "Pegar arma" (pré: arma no alcance | efeito: arma carregada). Setas ligam efeitos às pré-condições que eles satisfazem (efeito "arma carregada" de Recarregar → pré-condição "arma carregada" de Atacar). À esquerda, uma caixa "ESTADO ATUAL: arma descarregada, tenho munição, vejo alvo". Na base, destacada, a sequência resultante: "PLANO: Recarregar → Atacar". Mostrar em tom mais claro um caminho alternativo (Pegar arma → Atacar) que o planejador consideraria se não houvesse munição.
 Elementos obrigatórios: caixa de objetivo; blocos de ação com pré-condições/efeitos/custo; setas de encadeamento efeito→pré-condição; estado atual; plano resultante; caminho alternativo esmaecido.
+
+```mermaid
+flowchart LR
+    Estado["ESTADO ATUAL<br/>arma descarregada, tenho munição, vejo alvo"] --> Recarregar
+    Estado -.-> Pegar
+    Recarregar["Recarregar<br/>pré: tenho munição<br/>efeito: arma carregada"] -->|efeito satisfaz pré-condição| Atacar
+    Pegar["Pegar arma<br/>pré: arma no alcance<br/>efeito: arma carregada"] -.->|alternativa esmaecida| Atacar
+    Atacar["Atacar<br/>pré: arma carregada, vejo alvo<br/>efeito: jogador morto"] --> Goal["OBJETIVO: jogador morto"]
+```
 [/DIAGRAMA]
 
 **Vantagens e limitações.** O GOAP produz comportamento que *parece* engenhoso e adaptativo — o agente "improvisa" planos diante de situações variadas, o que reforça fortemente a ilusão de inteligência — e reduz o trabalho de antecipar todas as sequências à mão. Em contrapartida, é **mais caro** (a busca por um plano custa mais que descer uma árvore), **mais difícil de depurar e de controlar** (o comportamento *emerge* da busca, e prever o que o agente fará em cada situação é menos direto — atrito com o critério de autoria da Parte I), e exige modelar cuidadosamente pré-condições, efeitos e custos, o que é trabalhoso e sujeito a erros sutis. Por isso, o GOAP, embora influente e admirado, teve adoção **mais seletiva** que as BTs na indústria.
@@ -237,6 +283,20 @@ Título: Decisão por utilidade — pontuar e escolher
 Objetivo pedagógico: Mostrar como considerações passam por curvas de utilidade, combinam-se em pontuações por ação, e a ação de maior utilidade é escolhida.
 Descrição detalhada: Três colunas de ações candidatas — "Comer", "Dormir", "Socializar". Para cada ação, mostrar suas considerações de entrada (barras horizontais com valores 0–1, ex.: para Comer: "fome = 0,7", "comida por perto = 0,9") passando por pequenos gráficos de curva (a "curva de utilidade" de cada consideração), resultando numa pontuação parcial; as parciais combinam-se numa "utilidade final" exibida como um número grande (ex.: Comer = 0,81; Dormir = 0,45; Socializar = 0,30). Uma seta destaca a ação vencedora (Comer, maior utilidade) com o rótulo "ação escolhida". Incluir mini-legendas mostrando diferentes formas de curva (linear, crescente acelerada, em degrau).
 Elementos obrigatórios: ações candidatas; considerações de entrada normalizadas; curvas de utilidade; pontuações parciais e utilidade final por ação; destaque da ação de maior utilidade; exemplos de formas de curva.
+
+```mermaid
+flowchart LR
+    subgraph Comer["Comer"]
+        C1["fome = 0,7"] --> C2["curva de utilidade"] --> C3["utilidade final = 0,81"]
+    end
+    subgraph Dormir["Dormir"]
+        D1["cansaço = 0,5"] --> D2["curva de utilidade"] --> D3["utilidade final = 0,45"]
+    end
+    subgraph Socializar["Socializar"]
+        So1["tédio = 0,3"] --> So2["curva de utilidade"] --> So3["utilidade final = 0,30"]
+    end
+    C3 -->|maior utilidade| Escolha["Ação escolhida: Comer"]
+```
 [/DIAGRAMA]
 
 **Vantagens e limitações.** A IA de utilidade brilha em **decisões com muitos fatores contínuos e concorrentes**, produzindo comportamento que parece **ponderado e "orgânico"**, sem a rigidez das prioridades fixas; é fácil introduzir **variação** (via seleção probabilística) e ajustar o "temperamento" do agente mexendo nas curvas. Em contrapartida, é **mais difícil de depurar e de prever**: quando um agente faz algo estranho, descobrir *qual curva ou peso* causou aquilo pode ser trabalhoso, pois a decisão emerge de um balanço numérico e não de uma regra explícita (novamente, um atrito com o critério de controle do designer). Ajustar (*tunar*) as curvas e pesos exige iteração cuidadosa. Por isso, a utilidade é frequentemente usada **em combinação** com outras arquiteturas — por exemplo, uma folha de BT que, quando alcançada, usa utilidade para escolher *entre variações* de uma ação, ou uma FSM cujo estado é escolhido por pontuação de utilidade.

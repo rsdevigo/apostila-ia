@@ -92,6 +92,18 @@ Título: Anatomia de uma população genética
 Objetivo pedagógico: Fixar a relação hierárquica entre população, indivíduo, cromossomo, gene e aptidão em uma única imagem de referência.
 Descrição detalhada: Uma caixa grande rotulada "POPULAÇÃO (geração t)" contendo quatro "indivíduos" empilhados. Cada indivíduo é uma fileira de células (o cromossomo), com cada célula rotulada como um "gene" e contendo um valor (ex.: indivíduo A = [0.8 | 0.3 | 12 | 5.0]). À direita de cada indivíduo, uma barra horizontal de tamanho proporcional rotulada "aptidão (fitness)", com um número (ex.: A → 87, B → 42, C → 95, D → 12), mostrando que C é o mais apto e D o menos apto. Uma legenda destacando: "cromossomo = a solução codificada", "gene = uma posição/parâmetro", "aptidão = qualidade da solução". Setas laterais indicando que os indivíduos de maior aptidão (C, A) terão mais chance de reproduzir.
 Elementos obrigatórios: a população contendo vários indivíduos; cada indivíduo mostrado como cromossomo dividido em genes com valores; a barra de aptidão de cada um; a indicação de que maior aptidão = maior chance de reprodução.
+
+```mermaid
+flowchart TB
+    subgraph POP["POPULAÇÃO (geração t)"]
+        A["Indivíduo A: [0,8|0,3|12|5,0]<br/>aptidão = 87"]
+        B["Indivíduo B: [...]<br/>aptidão = 42"]
+        C["Indivíduo C: [...]<br/>aptidão = 95"]
+        D["Indivíduo D: [...]<br/>aptidão = 12"]
+    end
+    C -->|maior aptidão, mais chance| Repro["Reprodução"]
+    A -->|maior aptidão, mais chance| Repro
+```
 [/DIAGRAMA]
 
 ---
@@ -128,6 +140,21 @@ Título: O ciclo completo do Algoritmo Genético
 Objetivo pedagógico: Apresentar o laço evolutivo como um fluxo cíclico, deixando claro o ponto de entrada, o de decisão (parada) e o de saída.
 Descrição detalhada: Um fluxograma cíclico. No topo, uma caixa de início "1. Inicialização (população aleatória)". Uma seta desce para "2. Avaliação (calcular aptidão de cada indivíduo)". Dessa caixa, uma seta vai a um losango de decisão "Critério de parada atingido?". Do losango, a saída "SIM" leva a uma caixa final "Retornar a melhor solução". A saída "NÃO" continua o ciclo, descendo para "3. Seleção (escolher pais por aptidão)" → "4. Cruzamento (combinar pais → filhos)" → "5. Mutação (alterar genes ao acaso)" → "6. Elitismo (preservar os melhores)" → "7. Nova geração substitui a anterior", e uma seta longa retorna dessa última caixa de volta para "2. Avaliação", fechando o laço. Destacar visualmente que os passos 3–6 (seleção, cruzamento, mutação, elitismo) são os "operadores genéticos".
 Elementos obrigatórios: as oito etapas nomeadas; o laço fechado voltando à avaliação; o losango de critério de parada com as saídas SIM/NÃO; o destaque para o bloco de operadores genéticos.
+
+```mermaid
+flowchart TD
+    Start["1. Inicialização<br/>população aleatória"] --> Aval["2. Avaliação<br/>calcular aptidão de cada indivíduo"]
+    Aval --> Parar{Critério de parada atingido?}
+    Parar -->|Sim| Fim["Retornar a melhor solução"]
+    Parar -->|Não| Sel["3. Seleção<br/>escolher pais por aptidão"]
+    subgraph OP["Operadores Genéticos"]
+        Sel --> Cross["4. Cruzamento<br/>combinar pais → filhos"]
+        Cross --> Mut["5. Mutação<br/>alterar genes ao acaso"]
+        Mut --> Elite["6. Elitismo<br/>preservar os melhores"]
+    end
+    Elite --> Nova["7. Nova geração substitui a anterior"]
+    Nova --> Aval
+```
 [/DIAGRAMA]
 
 ---
@@ -249,6 +276,26 @@ Título: Os operadores genéticos em ação — seleção, crossover, mutação 
 Objetivo pedagógico: Ilustrar visualmente como dois pais selecionados geram filhos por crossover e mutação, e o papel do elitismo.
 Descrição detalhada: Quatro painéis em sequência. Painel 1 ("Seleção"): uma população de vários cromossomos com barras de aptidão; dois deles (de alta aptidão) destacados e marcados como "Pai 1" e "Pai 2". Painel 2 ("Crossover de um ponto"): os dois pais desenhados como fileiras de genes coloridos, com uma linha vertical tracejada marcando o "ponto de corte"; abaixo, dois filhos resultantes, cada um com a porção esquerda de um pai e a direita do outro (cores trocadas no ponto de corte). Painel 3 ("Mutação"): um dos filhos com um único gene destacado (piscando/em cor de alerta) que teve seu valor alterado ao acaso, com a legenda "taxa de mutação pequena". Painel 4 ("Elitismo"): a seta mostrando o melhor indivíduo da geração anterior sendo copiado intacto direto para a nova população, com a legenda "o melhor nunca se perde". Uma seta geral no rodapé indicando "geração t → geração t+1".
 Elementos obrigatórios: os dois pais selecionados por aptidão; o ponto de corte do crossover e os filhos resultantes; a mutação de um gene em um filho; a cópia do elite para a nova geração; a indicação da transição entre gerações.
+
+```mermaid
+flowchart LR
+    subgraph S1["1. Seleção"]
+        Pop["População<br/>(barras de aptidão)"] --> Pai1["Pai 1"]
+        Pop --> Pai2["Pai 2"]
+    end
+    subgraph S2["2. Crossover (um ponto)"]
+        Pai1 --> Corte{{"ponto de corte"}}
+        Pai2 --> Corte
+        Corte --> Filho1["Filho 1"]
+        Corte --> Filho2["Filho 2"]
+    end
+    subgraph S3["3. Mutação"]
+        Filho1 --> Mut["gene alterado ao acaso<br/>(taxa pequena)"]
+    end
+    Melhor["Melhor da geração t"] -->|"4. Elitismo — copiado intacto"| NovaGer["Nova população t+1"]
+    Mut --> NovaGer
+    Filho2 --> NovaGer
+```
 [/DIAGRAMA]
 
 ---

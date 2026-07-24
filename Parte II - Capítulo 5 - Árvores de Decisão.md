@@ -45,6 +45,16 @@ Título: Estrutura de uma árvore de decisão
 Objetivo pedagógico: Fixar os três elementos (nó de decisão, ramo, folha) e o processo de descida da raiz até a ação.
 Descrição detalhada: Árvore desenhada de cima para baixo. Raiz (nó de decisão): "Vejo o inimigo?". Dois ramos: "Não" leva a uma folha "Patrulhar"; "Sim" leva a outro nó de decisão "Minha vida > 30%?". Deste, o ramo "Não" leva à folha "Fugir"; o ramo "Sim" leva a um nó "Distância < 2 m?". Deste, "Sim" leva à folha "Atacar corpo a corpo"; "Não" leva à folha "Atirar". Os nós de decisão desenhados como losangos (ou retângulos), as folhas como retângulos arredondados/ovais com cor distinta, e os ramos rotulados com as respostas (Sim/Não). Uma seta lateral ilustra um "caminho de avaliação" destacado (por exemplo, Sim → Sim → Não → Atirar).
 Elementos obrigatórios: nó raiz; nós de decisão internos com testes; ramos rotulados com respostas; folhas de ação com cor distinta; um caminho de avaliação destacado da raiz à folha.
+
+```mermaid
+flowchart TD
+    A{Vejo o inimigo?} -->|Não| B[Patrulhar]
+    A -->|Sim| C{"Minha vida > 30%?"}
+    C -->|Não| D[Fugir]
+    C -->|Sim| E{"Distância < 2 m?"}
+    E -->|Sim| F[Atacar corpo a corpo]
+    E -->|Não| G[Atirar]
+```
 [/DIAGRAMA]
 
 ### 5.2.1 Árvore de decisão versus árvore de comportamento (distinção essencial)

@@ -171,6 +171,18 @@ Título: O ciclo Sentir → Pensar → Agir de um agente de jogo
 Objetivo pedagógico: Apresentar o modelo unificador de funcionamento de qualquer IA de jogo, que se repete a cada quadro.
 Descrição detalhada: Um diagrama circular (loop) com três grandes blocos dispostos em ciclo, conectados por setas no sentido horário. Bloco 1: "SENTIR (Percepção)" — subtítulo "coletar informações do ambiente: posições, visão, som, vida". Bloco 2: "PENSAR (Decisão)" — subtítulo "escolher a ação com base no que foi percebido: FSM, árvore, busca, aprendizado". Bloco 3: "AGIR (Atuação)" — subtítulo "executar a ação escolhida: mover, atirar, animar, falar". Uma seta do bloco AGIR retorna ao SENTIR, fechando o ciclo, com o rótulo "próximo quadro". Ao centro do círculo, o rótulo "AGENTE". Uma nuvem externa rotulada "AMBIENTE / MUNDO DO JOGO" envolve o ciclo, com setas indicando que Sentir lê do ambiente e Agir escreve no ambiente.
 Elementos que devem aparecer: três blocos (Sentir, Pensar, Agir); setas circulares; rótulo "próximo quadro"; rótulo central "Agente"; envoltório "Ambiente".
+
+```mermaid
+flowchart LR
+    subgraph AMB["Ambiente / Mundo do Jogo"]
+        direction LR
+        S["SENTIR<br/>(Percepção)<br/><small>posições, visão, som, vida</small>"]
+        P["PENSAR<br/>(Decisão)<br/><small>FSM, árvore, busca, aprendizado</small>"]
+        A["AGIR<br/>(Atuação)<br/><small>mover, atirar, animar, falar</small>"]
+        S --> P --> A
+        A -->|próximo quadro| S
+    end
+```
 [/DIAGRAMA]
 
 Esse ciclo é o **esqueleto conceitual de toda a apostila**. Cada família de técnicas que estudaremos preenche, sobretudo, a fase do **Pensar**:

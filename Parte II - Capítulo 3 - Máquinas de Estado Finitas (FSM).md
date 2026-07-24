@@ -58,6 +58,18 @@ Título: Anatomia de uma máquina de estados finita
 Objetivo pedagógico: Fixar visualmente os quatro conceitos elementares (estado, transição, evento, ação) em um único diagrama de referência.
 Descrição detalhada: Um diagrama de grafo com três estados desenhados como círculos rotulados "Patrulhar", "Perseguir" e "Atacar". Setas dirigidas ligam os estados representando transições: de Patrulhar para Perseguir (rótulo do evento: "vê o jogador"); de Perseguir para Atacar (rótulo: "distância < 2 m"); de Atacar para Perseguir (rótulo: "distância > 2 m"); de Perseguir para Patrulhar (rótulo: "perdeu o jogador de vista"). Dentro de cada círculo, uma pequena legenda indica a ação de permanência (por exemplo, dentro de "Patrulhar": "seguir rota de pontos"). Um dos círculos deve ter uma seta de entrada solta, sem origem, marcando o "estado inicial". Uma legenda lateral associa cada elemento gráfico ao seu nome: círculo = estado; seta = transição; texto sobre a seta = evento/condição; texto dentro do círculo = ação.
 Elementos obrigatórios: três estados como círculos; setas dirigidas rotuladas com eventos; marcação do estado inicial; ações dentro dos estados; legenda dos quatro conceitos.
+
+```mermaid
+stateDiagram-v2
+    [*] --> Patrulhar
+    Patrulhar: Patrulhar\n(ação: seguir rota de pontos)
+    Perseguir: Perseguir\n(ação: mover até o jogador)
+    Atacar: Atacar\n(ação: atacar corpo a corpo)
+    Patrulhar --> Perseguir: vê o jogador
+    Perseguir --> Atacar: distância < 2 m
+    Atacar --> Perseguir: distância > 2 m
+    Perseguir --> Patrulhar: perdeu o jogador de vista
+```
 [/DIAGRAMA]
 
 ### 3.2.1 Autômatos finitos e a raiz teórica
