@@ -8,7 +8,7 @@ A história da IA de jogos é, em grande medida, a história de uma **negociaç�
 
 Seguindo a orientação do projeto, adotamos uma abordagem **cronológica** e usamos **jogos reais** como marcos. Sempre que uma informação sobre a IA de um jogo não for oficialmente confirmada por seus desenvolvedores, isso será dito de forma explícita: trataremos como **análise técnica fundamentada**, não como fato documentado. Essa cautela é essencial em um campo onde a documentação técnica raramente é publicada pelos estúdios.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Muitas afirmações populares sobre "como funciona a IA de tal jogo" circulam pela internet como se fossem fatos, quando são, na verdade, inferências de jogadores ou análises não confirmadas. Nesta apostila, distinguimos rigorosamente o que foi **documentado pelos próprios desenvolvedores** (por exemplo, em palestras da GDC ou artigos técnicos) do que é **análise provável**. Adote você também essa disciplina: é a base da engenharia reversa responsável, tema da Parte VII.
 
 ---
@@ -32,7 +32,7 @@ Descrição detalhada: Um gráfico de duas faixas paralelas ao longo de um eixo 
 Elementos que devem aparecer: eixo temporal; duas faixas paralelas (hardware e técnicas); setas verticais de habilitação; marcos rotulados em ambas as faixas.
 [/DIAGRAMA]
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > O primeiro jogo eletrônico com um oponente controlado por computador amplamente reconhecido é frequentemente associado a *Pong* (Atari, 1972), cuja "IA" era simplesmente uma raquete que seguia a bola — mal se poderia chamar de inteligência. Ainda assim, já continha o germe de toda IA de jogos: um comportamento automático que dá ao jogador algo com que se medir. De uma raquete que segue a bola aos sistemas atuais, o salto é imenso — mas a pergunta de fundo permaneceu a mesma: *como criar um adversário convincente dentro dos recursos disponíveis?*
 
 ---
@@ -58,10 +58,10 @@ Cada fantasma alterna entre modos (estados) — essencialmente uma **máquina de
 
 **Análise interpretativa.** O brilho do design está em três decisões que ecoam tudo o que vimos no Capítulo 1. Primeiro, **personalidade emergente a partir de regras simples**: nenhum fantasma tem "personalidade" programada como tal; ela *emerge* da regra de mira e é *lida* pelo jogador como caráter — a ilusão de inteligência em estado puro. Segundo, **previsibilidade com margem**: os comportamentos são determinísticos o bastante para que jogadores experientes aprendam padrões e rotas de fuga (a tal "previsibilidade que permite estratégia" da seção 1.2.2), mas a combinação dos quatro gera situações variadas. Terceiro, os fantasmas alternam periodicamente entre modos de **perseguição (chase)** e **dispersão (scatter)**, em que recuam para seus cantos — um alívio rítmico deliberado que impede a frustração constante, exatamente o tipo de gestão do "ponto ideal" discutido em 1.2.3.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > *Pac-Man* é, provavelmente, o melhor exemplo introdutório de IA de jogos que existe: com quatro regras simples e uma máquina de estados mínima, produz-se a ilusão de quatro adversários com personalidades e intenções. Ele demonstra, num único jogo, quase todos os princípios do Capítulo 1 — ilusão de inteligência, comportamento emergente, previsibilidade estratégica e gestão da dificuldade. Voltaremos a ele no Capítulo 3 (como exemplo de FSM) e no Capítulo 15 (como estudo de caso completo).
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Os quatro fantasmas têm apelidos além dos nomes: na versão original japonesa, seus comportamentos eram descritos por características como "perseguidor", "emboscador", "caprichoso" e "tolo". O design foi intencionalmente pensado para que os fantasmas *não* atacassem todos da mesma forma — o criador queria evitar que o jogo fosse tenso e implacável o tempo todo, buscando justamente o equilíbrio de ritmo que hoje reconhecemos como gestão do fluxo.
 
 [IMAGEM NECESSÁRIA]
@@ -83,12 +83,12 @@ A **máquina de estados finita** organiza o comportamento de um personagem em um
 
 Os **scripts**, por sua vez, permitiam aos designers definir sequências de comportamento predeterminadas — o inimigo que sempre aparece naquele ponto, dispara naquela hora e recua para aquele local. Jogos de tiro e ação dos anos 1990 dependiam fortemente de scripts para criar sequências dramáticas e controladas. A vantagem era o **controle autoral absoluto**; a desvantagem, a **rigidez**: comportamentos roteirizados não se adaptam ao imprevisto e perdem o efeito na repetição.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > Muitos jogos marcantes dessa era combinavam FSMs para o comportamento de combate com scripts para os momentos roteirizados. Essa combinação — uma base reativa (FSM) sob uma camada de eventos autorais (scripts) — é um exemplo inicial da arquitetura **híbrida** discutida em 1.3.2, e prenuncia a forma como jogos modernos ainda organizam sua IA.
 
 Um marco frequentemente citado dessa era é *Half-Life* (Valve, 1998), elogiado por seus inimigos soldados que pareciam **coordenar-se em esquadrão** — flanqueando, recuando, lançando granadas para forçar o jogador a sair da cobertura. É importante o enquadramento correto: embora o resultado *pareça* coordenação tática sofisticada, boa parte do efeito vinha de FSMs bem ajustadas combinadas com **falas contextuais** ("*Cobertura!*", "*Ele está atrás daquilo!*") que comunicavam intenção ao jogador. É o princípio da seção 1.3.1 em ação: a comunicação do estado interno (por voz e animação) faz o jogador *ler* como inteligência algo que, internamente, é relativamente simples.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Concluir que, se um jogo antigo "parecia inteligente", ele devia usar técnicas avançadas. Frequentemente ocorria o oposto: a impressão de inteligência vinha de **boa comunicação** (falas, animações, timing) sobre uma lógica simples. Confundir o comportamento observável com o mecanismo interno é justamente o erro que a ideia de "ilusão de inteligência" nos ensina a evitar.
 
 ---
@@ -103,10 +103,10 @@ As **árvores de comportamento (Behavior Trees)** organizam o comportamento como
 
 O **GOAP (Goal-Oriented Action Planning)** representa uma abordagem diferente: em vez de o designer especificar *como* o agente deve se comportar, ele especifica **objetivos** e um conjunto de **ações** com **pré-condições** e **efeitos**; o agente então *planeja*, em tempo de execução, uma sequência de ações que atinge o objetivo. É um exemplo claro de agente **deliberativo** (seção 1.3.2), que raciocina sobre o futuro. O caso célebre e **documentado** é *F.E.A.R.* (Monolith, 2005), cujos inimigos foram amplamente elogiados por parecerem taticamente brilhantes — flanqueando, buscando cobertura, coordenando-se. O desenvolvedor Jeff Orkin apresentou publicamente o sistema GOAP de *F.E.A.R.*, tornando-o uma das referências mais estudadas da IA de jogos. Estudaremos o GOAP como conteúdo de **aprofundamento** no Capítulo 6 e retomaremos *F.E.A.R.* no Capítulo 15.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A IA de *F.E.A.R.* é um dos exemplos mais instrutivos da tese desta apostila. Análises técnicas do próprio criador apontam que grande parte da impressão de "esquadrão genial" vinha não só do planejamento GOAP, mas também de **falas coordenadas** e de comportamentos que *comunicavam* a tática ao jogador. Novamente: parte da inteligência percebida é **ilusão bem construída**. Mesmo com um planejador real por trás, é a comunicação que converte o cálculo em experiência.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Ainda nessa era surgiu, em *The Sims* (Maxis, 2000), uma abordagem distinta: a **IA de utilidade** combinada com **objetos inteligentes** (*smart objects*). Em vez de a IA do personagem conter toda a lógica, os próprios objetos do mundo "anunciam" as ações que oferecem e o quanto satisfazem as necessidades do Sim (uma geladeira anuncia "reduzo a fome"). O Sim apenas escolhe a ação de maior utilidade no momento. É uma forma elegante de distribuir a inteligência pelo ambiente — que estudaremos como aprofundamento no Capítulo 6 e como estudo de caso no Capítulo 15.
 
 ---
@@ -119,14 +119,14 @@ A partir dos anos 2010, dois movimentos convergentes abriram uma nova fase: o cr
 
 Na prática comercial, o aprendizado de máquina entrou de forma mais **cautelosa e localizada**, justamente pelas razões vistas no Capítulo 1: é difícil de controlar, de depurar e de ajustar à visão de design, além de caro de treinar. Seus usos mais consolidados na indústria tendem a ser **auxiliares**: teste automatizado e balanceamento de jogos (agentes que jogam milhares de partidas para encontrar exploits), animação orientada a dados, geração de conteúdo, personalização e detecção de trapaça, entre outros. O comportamento dos NPCs no jogo final, na maioria dos títulos, continua governado por técnicas determinísticas.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > É tentador — e comum na imprensa — anunciar que "a IA dos jogos agora aprende sozinha". Trate essas afirmações com ceticismo técnico. Na maioria dos jogos comerciais, o comportamento dos personagens **não** usa aprendizado de máquina em tempo de jogo; usa FSMs, árvores de comportamento e busca. O aprendizado, quando presente, costuma atuar **nos bastidores** (produção, teste, balanceamento) ou em usos muito específicos. Estudaremos a aprendizagem por reforço com esse enquadramento realista na Parte VI.
 
 Um exemplo pioneiro e frequentemente citado de aprendizado *dentro* do jogo é *Black & White* (Lionhead, 2001): a "Criatura" do jogador aprendia por reforço e imitação, ajustando seu comportamento conforme era recompensada ou repreendida. É um caso raro e influente de aprendizado como *mecânica central de jogo*, e não como ferramenta de bastidor — razão pela qual será nosso estudo de caso de aprendizado no Capítulo 12 e no Capítulo 15.
 
 Paralelamente, a **geração procedural de conteúdo** (PCG) amadureceu, criando mundos, fases, itens e até narrativas por algoritmo. Embora nem toda PCG seja "IA" no sentido de tomada de decisão de agentes, ela se entrelaça com o tema — por exemplo, na geração de comportamentos ou no ajuste dinâmico de dificuldade (o *AI Director* de *Left 4 Dead*, já citado, é um sistema orientado a dados que molda a experiência em tempo real).
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A Unity oferece o **ML-Agents**, um conjunto de ferramentas que permite treinar agentes com aprendizagem por reforço dentro da engine. É a ferramenta que usaremos como referência ao estudar aprendizado (Parte VI). Vale notar, porém, que o ML-Agents é hoje mais empregado em **pesquisa, prototipagem e teste** do que na IA final de jogos comerciais — coerente com o quadro realista descrito nesta seção.
 
 ---
@@ -147,7 +147,7 @@ Reunimos a seguir os marcos discutidos numa visão cronológica única. A tabela
 
 **Análise interpretativa.** A leitura da tabela confirma o fio condutor do capítulo: **cada nova família de técnicas surgiu quando o hardware a tornou viável e um problema de design a tornou necessária**. As FSMs não foram "superadas" pelas árvores de comportamento — elas continuam vivas e são a base do Capítulo 3; as árvores de comportamento surgiram para resolver um limite específico (a explosão de estados) que só se tornou crítico quando os jogos ficaram grandes o bastante. Da mesma forma, o aprendizado de máquina não "substituiu" as técnicas clássicas na prática comercial; ocupou nichos onde suas vantagens compensam suas dificuldades de controle. Essa é a lição histórica mais importante para o restante da apostila: **as técnicas se acumulam em camadas, não se substituem em bloco**. Um jogo moderno pode usar, simultaneamente, uma FSM dos anos 1980, um A\* dos anos 1960–1990 e um sistema orientado a dados dos anos 2010 — cada um resolvendo a parte do problema para a qual é a melhor ferramenta.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao estudar cada técnica nos próximos capítulos, retorne mentalmente a esta linha do tempo e pergunte: *que problema histórico fez essa técnica surgir? que restrição de hardware ela respeitava? o que ela resolveu que a anterior não resolvia?* Essa perspectiva histórica transforma uma lista de algoritmos em uma **narrativa de engenharia** — muito mais fácil de compreender e de reter.
 
 [IMAGEM NECESSÁRIA]

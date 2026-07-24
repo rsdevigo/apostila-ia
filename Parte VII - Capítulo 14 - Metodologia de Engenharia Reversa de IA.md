@@ -18,7 +18,7 @@ No campo específico dos jogos, a história tem dois momentos. O primeiro é o d
 
 O segundo momento é o da **profissionalização e da abertura parcial**. A partir dos anos 2000, um movimento notável transformou a IA de jogos de segredo industrial em conhecimento compartilhado. A **Game Developers Conference (GDC)** tornou-se o palco onde desenvolvedores passaram a **descrever suas próprias arquiteturas** em palestras técnicas; surgiram **postmortems** detalhados (na revista *Game Developer* e no site Gamasutra, renomeado *Game Developer* em 2021), livros como a série ***Game AI Pro*** (organizada por Steve Rabin) e ***AI for Games*** (Ian Millington), e a comunidade acadêmica de IA para jogos se consolidou. Palestras como a de **Jeff Orkin** sobre o GOAP de *F.E.A.R.* (2006) e a de **Damian Isla** sobre a arquitetura de *Halo 2* (2005) tornaram-se referências fundadoras. Esse movimento não elimina a engenharia reversa — pelo contrário, dá a ela um **gabarito**: agora podemos **comparar** nossas hipóteses, levantadas por observação, com o que os próprios criadores revelaram. É precisamente essa combinação — observar de fora e, quando existir, confrontar com documentação oficial — que define a metodologia madura deste capítulo.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > A expressão "engenharia reversa" carrega, na indústria de software em geral, uma conotação às vezes controversa, ligada à quebra de proteções e à cópia de produtos. No contexto **acadêmico e didático** desta apostila, o sentido é outro e muito mais antigo: o de **estudar um sistema observável para compreendê-lo**, como um cientista estuda a natureza. Voltaremos a essa distinção, que é sobretudo ética, na seção 14.4.
 
 ---
@@ -37,7 +37,7 @@ A terceira razão é simplesmente **prática e cultural**. Documentar a fundo um
 
 Uma quarta razão, mais sutil, é que **frequentemente não há uma "técnica" única a revelar**. A IA de um jogo comercial raramente é "uma FSM" ou "uma behavior tree" pura. É quase sempre um **híbrido**: uma behavior tree que aciona um planejador, que consulta um mapa de influência, que pede uma rota a um A\*, tudo orquestrado por camadas de código específicas daquele jogo. Reduzir isso a um único nome seria falso. Parte do trabalho da engenharia reversa é justamente reconhecer que se observa um **sistema composto**, e identificar cada peça provável.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Mesmo quando um jogo tem documentação oficial excelente — como *F.E.A.R.* ou *Left 4 Dead* —, ela descreve o sistema **do ponto de vista de quem o construiu**, com o vocabulário e a organização que fizeram sentido para aquela equipe. A engenharia reversa continua útil por um motivo pedagógico: ela treina você a **chegar sozinho** a hipóteses que depois pode confrontar com a fonte oficial. Acertar a hipótese antes de ler a palestra é o melhor exercício de aprendizado que esta Parte oferece.
 
 ### Por que a engenharia reversa se tornou uma habilidade importante
@@ -75,7 +75,7 @@ Observar não é o mesmo que assistir. Assistir é passivo; observar é uma ativ
 
 **Coleta de evidências.** A quarta regra é **registrar**. A memória humana é péssima testemunha: ela confunde, generaliza e inventa padrões que não existem. A observação séria produz um **registro** — anotações, tabelas, capturas de tela, gravações de vídeo que possam ser revistas quadro a quadro. A evidência registrada é o que separa uma hipótese fundamentada de uma impressão vaga, e é o que permite que **outra pessoa** verifique a análise. Uma boa evidência é **específica e datável**: "no minuto 3:42, ao ouvir o tiro a ~15 metros atrás de uma parede, o guarda virou-se e caminhou até a origem do som, parando na parede" vale infinitamente mais do que "os guardas escutam tiros".
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Grave suas sessões de observação. Uma captura de vídeo permite avançar quadro a quadro e flagrar detalhes invisíveis em tempo real — o instante exato em que um inimigo muda de postura, a fração de segundo entre o estímulo e a reação (que sugere tempos de "percepção"), a repetição idêntica de uma animação (que sugere um número finito de estados). Muitas descobertas de engenharia reversa só aparecem no *replay* lento, nunca no jogo ao vivo.
 
 [DIAGRAMA]
@@ -99,7 +99,7 @@ O coração da engenharia reversa comportamental é tratar o NPC como um sistema
 
 **Comportamento emergente.** Por fim, alguns dos efeitos mais impressionantes não estão programados em nenhum agente individual: **emergem** da interação de regras simples entre muitos agentes, ou entre agentes e ambiente. Bandos que parecem coordenados sem um "líder", situações que nunca se repetem igual, dinâmicas de grupo que surpreendem até os desenvolvedores — tudo isso é sinal de **emergência** (um conceito central desde a Parte I). O engenheiro reverso precisa de cuidado redobrado aqui, porque a emergência é a maior **fonte de ilusão**: ela faz parecer que há um mecanismo sofisticado de coordenação onde, muitas vezes, há apenas regras locais simples se somando. Reconhecer emergência é reconhecer que "parece coordenado" **não** implica "há um coordenador".
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Confundir "parece inteligente" com "é complexo". O erro mais frequente do analista iniciante é **superestimar** o mecanismo: ao ver um esquadrão que flanqueia de forma convincente, conclui que há um planejador tático central sofisticado, quando muitas vezes o efeito vem de regras individuais simples ("se um aliado está atirando, eu procuro outro ângulo") que **se somam** em coordenação aparente. É o caso célebre de *F.E.A.R.*, que estudaremos: a "coordenação de esquadrão" tão elogiada é, em boa parte, **ilusão emergente** produzida por agentes que planejam **individualmente** e **anunciam** suas ações em voz alta. A regra de ouro: **prefira sempre a hipótese mais simples que explique a evidência** (é a navalha de Occam aplicada à IA de jogos).
 
 ### 14.2.3 Identificando técnicas
@@ -183,7 +183,7 @@ Descrição detalhada: Um fluxo linear com seis blocos numerados, ligados por se
 Elementos obrigatórios: os seis blocos nomeados e numerados; o laço de retorno da validação para a coleta; a faixa inferior com o princípio da incerteza; destaque na etapa 5 para "tentar refutar".
 [/DIAGRAMA]
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O roteiro parece longo, mas na prática ele se torna um hábito rápido. Depois de aplicá-lo a dois ou três jogos, você passa a executar as etapas 1 a 4 quase automaticamente durante o próprio jogo, reservando as etapas 5 e 6 (validação e documentação) para quando quiser produzir uma análise formal. O valor do roteiro não é a burocracia — é garantir que você **não pule** as duas partes que os iniciantes sempre pulam: **tentar refutar** a própria hipótese e **separar** o que viu do que supôs.
 
 ---
@@ -198,7 +198,7 @@ Há uma diferença fundamental — jurídica e ética — entre **observar o com
 
 Muito diferente é **descompilar** o código de um jogo, contornar proteções técnicas, extrair *assets* protegidos ou **copiar** a implementação de um sistema para um produto concorrente. Essas ações entram no terreno da **violação de direitos autorais, de contratos de licença (EULA) e, potencialmente, de leis de proteção**, e **não** são o que se ensina aqui. A distinção prática é clara: **observar o que o jogo mostra a quem joga é legítimo; abrir o que o jogo esconde de quem joga é outra coisa**. Reconhecer que um inimigo "provavelmente usa GOAP" a partir de como ele se comporta é análise; obter o código do planejador e reutilizá-lo é apropriação. A engenharia reversa desta apostila é, e deve permanecer, **estritamente comportamental**.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Ideias e técnicas — FSM, GOAP, A\*, behavior trees — **não** são propriedade de ninguém: são conhecimento científico e de engenharia, de domínio público, que esta apostila inteira ensina livremente. O que é protegido é a **implementação específica** de um estúdio (seu código, seus *assets*, sua arte). Aprender que um problema pode ser resolvido com GOAP porque *F.E.A.R.* o fez é uso perfeitamente legítimo do conhecimento. Copiar o código de *F.E.A.R.* não é. Mantenha essa fronteira sempre nítida.
 
 ### Uso responsável da documentação
@@ -225,7 +225,7 @@ Chegamos ao princípio que é a espinha dorsal de toda esta Parte. Uma **hipóte
 
 Isso tem uma consequência direta na forma como escrevemos. Frases como "*F.E.A.R.* usa GOAP" só são apropriadas quando há documentação que as confirme (e, nesse caso, há — a palestra de Orkin). Frases como "os inimigos de *Halo* provavelmente reavaliam prioridades numa árvore de comportamento" devem manter o "provavelmente", porque descrevem uma **inferência**. A disciplina de escrever com esse cuidado — qualificar cada afirmação pelo seu nível de certeza — não é um preciosismo acadêmico: é o que distingue a análise técnica séria da especulação de fórum. Todo o Capítulo 15 é construído sobre essa distinção.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Adote três rótulos ao escrever qualquer análise, e use-os explicitamente: **[Documentado]** para o que uma fonte oficial confirma; **[Inferência]** para o que você deduz da observação com boa base; **[Especulação]** para hipóteses plausíveis mas frágeis. Marcar cada afirmação com um desses rótulos — como faremos nos estudos de caso — força a honestidade intelectual e torna a análise imediatamente confiável para quem a lê.
 
 **Nota sobre os estudos de caso desta apostila.** Fica aqui o compromisso que vale para todo o Capítulo 15: salvo quando explicitamente indicado como **documentado** por fonte oficial, tudo o que a apostila afirma sobre a implementação interna dos jogos analisados constitui **análise técnica fundamentada** — inferência a partir de comportamento observável e do repertório teórico —, e **não** um relato verificado do código. Essa ressalva não é uma formalidade: é a aplicação honesta da própria metodologia que este capítulo ensina.

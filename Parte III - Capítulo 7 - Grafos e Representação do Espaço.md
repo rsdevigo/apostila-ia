@@ -8,7 +8,7 @@ Antes, porém, de aprender *como* se busca um caminho — o que faremos no Capí
 
 Este é, portanto, um **capítulo de fundamentação**. Seu objetivo não é ensinar um algoritmo, mas construir, do zero, todo o vocabulário matemático e conceitual necessário para que os capítulos seguintes façam sentido. Seguindo a filosofia da apostila, partimos do **problema** — como o NPC "enxerga" o mundo navegável —, edificamos os **fundamentos** com a teoria dos grafos, detalhamos o **funcionamento** das três grandes formas de representação espacial (grades, waypoints e malhas de navegação), aterrissamos nas **ferramentas** oficiais da Unity (o sistema *AI Navigation* / NavMesh) e de terceiros, e discutimos como a **indústria** decide, na prática, qual representação usar. Ao terminar este capítulo, você deverá enxergar qualquer cenário de jogo como aquilo que ele realmente é para a IA: um conjunto de **nós** conectados por **arestas** com **custos** — um grafo pronto para ser percorrido.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > A teoria dos grafos é muito mais antiga do que os computadores. Ela nasceu em 1736, quando o matemático suíço **Leonhard Euler** resolveu o famoso problema das **sete pontes de Königsberg**: seria possível passear pela cidade cruzando cada uma de suas sete pontes exatamente uma vez? Euler percebeu que a resposta não dependia da geografia detalhada, mas apenas de *como as regiões estavam conectadas*. Ao abstrair as porções de terra como pontos e as pontes como linhas ligando esses pontos, ele criou o primeiro grafo da história e provou que o passeio era impossível. Essa ideia — descartar o detalhe irrelevante e reter apenas a **estrutura de conexões** — é exatamente o que um motor de jogos faz quando transforma um cenário rico em um grafo de navegação. Quase três séculos depois, a intuição de Euler move cada NPC que dá um passo na tela.
 
 ---
@@ -19,12 +19,12 @@ Retomemos o ciclo **Sentir → Pensar → Agir** da Parte I e as arquiteturas de
 
 Considere o modo mais ingênuo de mover um personagem até um alvo: a cada quadro, calcular a direção em linha reta até o destino e dar um passo nessa direção. Essa técnica — que estudaremos formalmente como *seek*, um comportamento de direção (*steering*) — funciona perfeitamente em um campo aberto e vazio. O problema é que **o mundo dos jogos não é vazio**: há paredes, penhascos, rios, mesas, caixas, outros personagens. Assim que existe um único obstáculo entre o agente e o alvo, o movimento em linha reta falha: o personagem caminha até encostar na parede e ali fica, empurrando-a inutilmente, ou pior, atravessa-a, quebrando por completo a ilusão de inteligência que tanto trabalho custou a construir nas Partes anteriores.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Confundir **busca de caminho** (*pathfinding*) com **direção/locomoção** (*steering*). São dois problemas distintos e complementares. A busca de caminho decide a **rota global** — a sequência de pontos que leva da origem ao destino contornando os obstáculos grandes e fixos do cenário. A direção cuida do **movimento local** — como o corpo do personagem segue essa rota de forma suave, desviando de obstáculos pequenos e dinâmicos (outro NPC que cruza a frente, uma caixa que rolou). Esta Parte trata da primeira; a segunda é um tema de locomoção e animação. Um sistema robusto usa as duas em camadas: o pathfinding traça o caminho, o steering o percorre.
 
 O problema real, portanto, não é "mover em direção ao alvo" — isso é fácil. O problema é **encontrar uma sequência de deslocamentos que respeite a geometria do cenário**, contornando os obstáculos intransponíveis, de preferência pelo trajeto mais curto (ou mais barato) possível, e fazê-lo rápido o bastante para caber no orçamento de quadro. E aqui surge a dificuldade central: um algoritmo não consegue "raciocinar" sobre uma geometria contínua de polígonos. Ele precisa de um **modelo discreto e finito** do espaço — um conjunto bem definido de posições possíveis e de conexões entre elas. É preciso, em outras palavras, **converter o mundo em um grafo**.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Pense em como você mesmo daria a alguém instruções para atravessar um shopping: você não descreveria cada centímetro do piso. Você diria algo como "vá até a praça de alimentação, vire à direita no corredor das lojas de roupa, suba a escada rolante, e a loja fica ao lado do cinema". Você naturalmente reduziu o espaço contínuo a um punhado de **lugares relevantes** (nós) e **conexões diretas** entre eles (arestas). Essa redução é precisamente o que uma representação espacial faz para o NPC. O algoritmo de busca, no capítulo seguinte, é apenas quem escolhe *qual* sequência dessas conexões seguir.
 
 Este capítulo constrói, então, a ponte entre o mundo geométrico do jogo e o mundo abstrato dos algoritmos. Começaremos pela matemática que dá nome a essa ponte — a teoria dos grafos — e depois veremos as três maneiras concretas de erguê-la.
@@ -41,7 +41,7 @@ A tradução para jogos é direta e vale a pena fixá-la desde já, pois será u
 - cada **aresta** representa a possibilidade de **ir diretamente de um lugar a outro** sem passar por um terceiro (um passo de uma célula para a vizinha, uma linha de visão livre entre dois waypoints);
 - o **caminho** que buscamos é uma **sequência de arestas** que liga o nó de origem ao nó de destino.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Um ponto de terminologia que confunde iniciantes: os "nós" de um grafo de navegação **não são necessariamente pontos isolados no espaço**. Dependendo da representação, um nó pode ser uma **célula quadrada** (grade), um **ponto** (waypoint) ou até um **polígono inteiro** (NavMesh). O que os unifica é o papel abstrato: no grafo, cada um é *um vértice*, um lugar entre o qual e seus vizinhos existe uma conexão. Manter clara a distinção entre o *objeto geométrico* (célula, ponto, polígono) e seu *papel no grafo* (vértice) evita a maior parte da confusão deste capítulo.
 
 ### 7.2.1 Vértices, arestas, pesos e grafos direcionados
@@ -54,7 +54,7 @@ Vamos refinar os elementos do grafo com os atributos de que a busca de caminhos 
 
 **Pesos (custos).** Nem toda conexão é igualmente "barata". Atravessar um pântano deve custar mais do que atravessar uma estrada; subir uma ladeira, mais do que descer. Para modelar isso, associamos a cada aresta um **peso** (ou **custo**), um número que representa o "esforço" de percorrê-la. Um grafo com pesos nas arestas é chamado de **grafo ponderado** (*weighted graph*). Quando todas as arestas têm o mesmo custo (por exemplo, custo 1 para todo passo), o grafo é dito **não ponderado** — um caso particular em que buscar o caminho mais curto equivale a buscar o caminho com **menos arestas**. O conceito de custo é o que permite ao pathfinding ir além de "o caminho com menos passos" e alcançar "o caminho mais **conveniente**", desviando de terrenos perigosos ou lentos mesmo que isso signifique dar mais passos.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Os pesos de aresta são uma das ferramentas mais expressivas — e mais subutilizadas — do design de IA. Ao atribuir custo alto a células próximas de precipícios, de lava ou da linha de tiro do jogador, o designer faz os NPCs **preferirem naturalmente** rotas seguras, sem escrever uma única regra explícita de "evite o perigo". O caminho seguro simplesmente *emerge* como o mais barato. Esse é um exemplo perfeito da filosofia da apostila: a "inteligência" observada (o inimigo que se esgueira pela lateral em vez de atravessar o campo aberto) é, na verdade, o subproduto de uma boa modelagem de custos, não de um raciocínio sofisticado.
 
 **Grafos direcionados e não direcionados.** Uma aresta pode ser de mão dupla ou de mão única. Em um **grafo não direcionado**, a aresta entre A e B permite ir de A para B *e* de B para A, com o mesmo custo — o caso comum de terreno plano. Em um **grafo direcionado** (*directed graph* ou *dígrafo*), as conexões têm sentido: pode existir uma aresta de A para B sem existir a de B para A, ou os custos podem diferir em cada sentido. Isso modela situações reais de jogo: uma plataforma da qual se pode **pular para baixo**, mas não subir; uma ladeira barata de descer e cara de subir; um portão de mão única. A capacidade de representar assimetrias é uma das razões pelas quais o grafo é a estrutura escolhida — ela captura, com naturalidade, a irreversibilidade de muitos movimentos.
@@ -74,7 +74,7 @@ Três conceitos derivados completam o ferramental de grafos de que precisaremos.
 
 **Conectividade.** Um grafo é **conexo** se existe pelo menos um caminho entre qualquer par de vértices. Em jogos, essa propriedade tem consequência prática direta: se o grafo de navegação estiver dividido em **componentes desconexos** — por exemplo, uma ilha sem ponte ligando ao continente —, nenhum algoritmo do mundo encontrará um caminho entre eles, porque ele simplesmente **não existe**. Reconhecer a conectividade é vital: muitos jogos pré-calculam, para cada nó, a qual "ilha" (componente conexo) ele pertence, de modo a **responder instantaneamente** que dois pontos são inalcançáveis, sem desperdiçar processamento numa busca fadada ao fracasso.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Antes de disparar uma busca de caminho potencialmente cara, verifique se origem e destino estão no **mesmo componente conexo**. Essa checagem, feita com uma marcação pré-calculada de "ilhas" de navegação, custa quase nada e evita o pior caso do A\*: uma busca que explora *todo* o mapa alcançável apenas para concluir, ao final, que o destino era inalcançável. Em jogos de mundo aberto, essa única otimização economiza uma quantidade enorme de processamento desperdiçado.
 
 **Representação em memória.** Um grafo precisa ser armazenado em alguma estrutura de dados, e a escolha afeta o desempenho da busca. As duas formas clássicas, apresentadas em Cormen et al., são:
@@ -99,7 +99,7 @@ A primeira decisão de projeto numa grade é a **conectividade das células**, i
 - **Conectividade-4 (vizinhança de von Neumann):** cada célula liga-se apenas às quatro vizinhas ortogonais (norte, sul, leste, oeste). O movimento é "em cruz"; não há diagonais. Simples e sem ambiguidades, mas produz caminhos com aparência "escadinha" e superestima distâncias na diagonal.
 - **Conectividade-8 (vizinhança de Moore):** cada célula liga-se às oito vizinhas, incluindo as quatro diagonais. Produz caminhos mais naturais e curtos, mas introduz duas sutilezas: o custo de um passo diagonal deve ser maior que o de um ortogonal (a diagonal de um quadrado de lado 1 mede `√2 ≈ 1,41`, não 1), e é preciso decidir se um agente pode "cortar" a quina entre dois obstáculos diagonais — o chamado problema do *corner cutting*.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > O detalhe do **custo diagonal** parece pedante, mas ignorá-lo produz um erro visível: se um passo diagonal custar o mesmo que um ortogonal (custo 1 para ambos), o algoritmo passa a acreditar que andar na diagonal é tão barato quanto andar reto e produz caminhos em ziguezague antinaturais. O valor correto é aproximadamente **1,41** (`√2`) para a diagonal contra **1,0** para a ortogonal. Muitos motores usam a aproximação inteira de custo **14** para diagonais e **10** para ortogonais, evitando aritmética de ponto flutuante sem perder a proporção. Esse é um "erro comum" clássico de quem implementa pathfinding em grade pela primeira vez.
 
 [DIAGRAMA]
@@ -113,7 +113,7 @@ Elementos obrigatórios: grade com células livres e bloqueadas; painel-4 e pain
 
 **Limitações das grades.** O custo de memória e de busca cresce com a **resolução**: uma grade fina o suficiente para representar bem espaços apertados pode ter milhões de células, tornando a busca cara — problema que motiva diretamente o Capítulo 9. Grades quadradas representam mal geometrias **oblíquas ou curvas** (uma parede diagonal vira uma escadinha de blocos). E há o já mencionado viés direcional: mesmo com conectividade-8, os caminhos tendem a ter uma aparência artificialmente "quadriculada" antes da suavização.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Nem toda grade é quadrada. Alguns jogos usam grades **hexagonais** (populares em estratégia, como em vários títulos da série *Civilization* e em wargames), nas quais cada célula tem seis vizinhos **equidistantes** — o que elimina o problema do custo diagonal, já que todos os passos custam o mesmo. Outros usam **grades triangulares**. A escolha da forma da célula é uma decisão de design que afeta tanto a estética do movimento quanto a matemática da busca. O grafo subjacente, no entanto, continua sendo apenas nós e arestas — a forma da célula muda quem são os vizinhos, não a natureza abstrata da representação.
 
 ### 7.3.2 Waypoints e grafos de pontos de rota
@@ -122,7 +122,7 @@ Se a grade cobre o espaço inteiro com células, a abordagem de **waypoints** (p
 
 O funcionamento em jogo tem três passos. Primeiro, o agente encontra o waypoint mais próximo de sua posição atual e o mais próximo do destino (os pontos de "entrada" e "saída" da rede). Segundo, roda-se a busca de caminho sobre o grafo de waypoints, obtendo uma sequência de pontos a visitar. Terceiro, o agente caminha em linha reta de waypoint em waypoint. Como as arestas foram construídas garantindo linha de visão livre, cada trecho reto é, por definição, transitável.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > Os grafos de waypoints foram a espinha dorsal da IA de movimento em clássicos do tiro em primeira pessoa e da ação 3D da virada do milênio. Marcavam-se manualmente, no editor de níveis, os pontos por onde os inimigos deveriam poder passar — corredores, batentes de porta, cantos de sala — e o motor conectava os que se enxergavam. Essa herança explica por que, em jogos daquela era, os inimigos às vezes pareciam "correr sobre trilhos invisíveis": eles literalmente seguiam de waypoint em waypoint. A técnica era barata e eficaz, mas dependia intensamente do trabalho manual dos designers, o que se tornaria seu calcanhar de Aquiles.
 
 **Vantagens dos waypoints.** O grafo é **minúsculo**, então a busca é **muito rápida** e consome pouquíssima memória. O designer tem **controle autoral** direto: pode induzir os NPCs a preferir certos corredores, a cobrir posições táticas específicas, a evitar zonas — basta posicionar (ou não) waypoints ali. Essa controlabilidade dialoga diretamente com o critério de autoria da Parte I.
@@ -142,12 +142,12 @@ A **malha de navegação** (*navigation mesh*, universalmente abreviada **NavMes
 
 O grafo, novamente, emerge naturalmente, mas com uma virada conceitual importante: **cada polígono é um nó**, e há uma **aresta** entre dois polígonos que **compartilham uma borda** (por onde o agente pode cruzar de um para o outro). Repare na inversão em relação à grade: lá, o nó era uma célula minúscula de tamanho fixo; aqui, o nó é um polígono que pode ser **grande** onde o espaço é aberto e **pequeno** onde o espaço é recortado. Um salão vazio pode ser um único triângulo enorme; um corredor cheio de colunas, uma colcha de retalhos de triângulos pequenos. Essa **adaptatividade** é a grande virtude da NavMesh: ela gasta detalhe (e, portanto, nós) apenas onde a geometria exige, mantendo o grafo pequeno em áreas abertas.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A propriedade de "cobrir áreas, não linhas" é o que dá à NavMesh sua fluidez característica. Como cada polígono representa uma região *inteira* onde o movimento livre é garantido, o agente não fica preso a trilhos: dentro de um polígono, ele pode ir em linha reta para qualquer ponto; a busca só precisa decidir **por quais polígonos passar**, e o refinamento fino do trajeto (por onde exatamente cruzar cada borda) é resolvido depois, na fase de suavização (Capítulo 9). É essa combinação — busca grossa por polígonos + ajuste fino dentro deles — que produz o movimento natural dos NPCs em jogos como *The Last of Us* ou qualquer título 3D contemporâneo.
 
 **Como a NavMesh é construída.** Aqui reside outra vantagem decisiva sobre os waypoints: a malha é, em geral, **gerada automaticamente** por um processo de *baking* ("cozimento"). O motor analisa a geometria estática do cenário e os parâmetros do agente — seu **raio** (largura), sua **altura**, a **inclinação máxima** que ele consegue subir e a **altura de degrau** que consegue vencer — e calcula quais superfícies são caminháveis para *aquele* agente, recuando as bordas da malha para longe das paredes pela medida do raio (de modo que o centro do agente nunca leve seu corpo a atravessar um obstáculo). O resultado é uma malha sob medida, produzida em segundos ou minutos, sem a marcação manual ponto a ponto que atormentava os waypoints. A biblioteca de código aberto **Recast**, de Mikko Mononen, tornou-se o padrão de fato para essa geração e está por trás dos sistemas de NavMesh de vários motores comerciais.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Esquecer que uma NavMesh é construída **para um agente específico**. A malha calculada para um humano de raio pequeno e passo baixo **não serve** para um veículo largo ou para um monstro gigante que não passa pelas mesmas portas nem sobe as mesmas rampas. Quando um jogo tem agentes de tamanhos muito diferentes, é preciso gerar **várias NavMeshes**, uma por perfil de agente. Assumir que "uma malha serve para todos" produz o bug clássico do inimigo enorme que tenta atravessar uma passagem estreita porque a malha foi feita pensando em personagens pequenos.
 
 [DIAGRAMA]
@@ -183,7 +183,7 @@ Como produzir: Montar um cenário mínimo na Unity com o pacote AI Navigation, a
 Legenda sugerida: "A NavMesh (em azul) recobre apenas a superfície caminhável, recuada das paredes pela medida do raio do agente. Cada polígono dessa malha é um nó do grafo de navegação."
 [/IMAGEM NECESSÁRIA]
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > É instrutivo notar que a Unreal Engine oferece um sistema conceitualmente equivalente — sua navegação também é baseada em NavMesh gerada por Recast — e que motores proprietários de grandes estúdios seguem a mesma filosofia. Isso não é coincidência: a NavMesh venceu como padrão da indústria 3D porque resolve, de uma vez, os dois maiores problemas das alternativas (a explosão de memória das grades finas e o custo de autoria dos waypoints). Ao aprender os **conceitos**, e não os menus, o estudante transfere o conhecimento sem esforço de um motor a outro — que é exatamente o que a apostila pretende.
 
 Para **grades**, a Unity não traz um sistema nativo dedicado de pathfinding em grid (o NavMesh é a via oficial), mas grades são triviais de implementar sobre a lógica do jogo quando o design pede — e são a base de assets de terceiros voltados a jogos 2D e de estratégia. Para **waypoints**, embora hoje raramente sejam a representação primária de movimento, o conceito sobrevive como **pontos de interesse** táticos (posições de cobertura, pontos de patrulha) que decoram uma NavMesh, combinando as duas ideias.
@@ -198,7 +198,7 @@ A mais conhecida no ecossistema Unity é o **A\* Pathfinding Project**, de Aron 
 
 No campo do código aberto, a já mencionada biblioteca **Recast & Detour** (Recast para gerar a malha, Detour para buscar e seguir caminhos nela) é o motor por trás de boa parte da navegação 3D da indústria e pode ser integrada diretamente por equipes que desenvolvem tecnologia própria. Conhecer sua existência ajuda o estudante a entender que o "botão de bake" da Unity não é mágica, mas a interface amigável de um algoritmo público e bem documentado.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > A escolha da ferramenta deve seguir a escolha da **representação**, e não o contrário. Primeiro pergunte: *meu mundo é melhor descrito por uma grade, por waypoints ou por áreas (NavMesh)?* — decisão que depende de o jogo ser 2D quadriculado, 3D com espaço aberto, dinâmico ou estático, com um ou muitos tipos de agente. Só então escolha a ferramenta que melhor implementa aquela representação. Escolher a ferramenta antes de entender o problema é uma inversão que costuma custar caro em retrabalho.
 
 ---

@@ -8,7 +8,7 @@ Poucos algoritmos têm uma presença tão dominante em sua área quanto o A\* te
 
 Este capítulo o constrói **por camadas**, jamais introduzindo um conceito antes de seus pré-requisitos. Partimos do **problema** do menor caminho em tempo real; recuamos até o algoritmo de **Dijkstra** para entender a **busca não-informada** e o que lhe falta; introduzimos a ideia de **heurística** e de **busca informada**, chegando à célebre função de avaliação `f = g + h`; detalhamos o **funcionamento** passo a passo, com as **listas aberta e fechada**, a **reconstrução do caminho** e um **traço de execução** completo; formalizamos as propriedades que explicam *por que* o A\* funciona — **admissibilidade** e **consistência** da heurística — e o impacto de diferentes heurísticas; e, por fim, aterrissamos a teoria nos **jogos conhecidos**, nas **ferramentas** da Unity (NavMesh) e de terceiros (A\* Pathfinding Project) e no **mercado**. Ao final, ficará claro não apenas *como* o A\* funciona, mas *por que* ele se tornou o algoritmo de busca de caminhos mais utilizado da história dos jogos.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > O A\* nasceu para um robô, não para um jogo. Em 1966–1972, o Stanford Research Institute desenvolvia **Shakey**, o primeiro robô móvel capaz de raciocinar sobre as próprias ações. Shakey precisava planejar como se deslocar por um ambiente com obstáculos, e a busca de Dijkstra — embora correta — era lenta demais, pois explorava o espaço em todas as direções sem noção de "para onde fica o objetivo". Hart, Nilsson e Raphael perceberam que, se o algoritmo pudesse **estimar** a distância que ainda faltava até o alvo, ele poderia **priorizar** a exploração na direção certa. Essa estimativa é a **heurística**, e a ideia de combiná-la com o custo já percorrido é toda a genialidade do A\*. Décadas depois, a mesma matemática que guiava um robô desajeitado por um laboratório move milhões de personagens por mundos virtuais.
 
 ---
@@ -23,7 +23,7 @@ A dificuldade não está em *existir* uma solução — em um grafo conexo, bast
 2. **Velocidade:** o cálculo deve caber no **orçamento de quadro**. Num jogo a 60 quadros por segundo, há cerca de 16 milissegundos para *tudo* — física, renderização, som, lógica de jogo e IA. A busca de caminho disputa uma fatia mínima desse tempo, muitas vezes para **dezenas de agentes ao mesmo tempo**.
 3. **Escalabilidade:** o mesmo algoritmo precisa funcionar num grafo de algumas centenas de nós (um nível pequeno) e num de centenas de milhares (um mundo aberto ou uma grade fina).
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A tensão entre **otimalidade** e **velocidade** é o eixo de todo o pathfinding de jogos, e vale internalizá-la agora. Em muitos jogos, um caminho **ligeiramente subótimo calculado em tempo hábil** é infinitamente preferível a um caminho **perfeito que trava o jogo por meio segundo**. Essa é a mesma lógica pragmática da Parte I: a IA de jogos busca o *convincente e barato*, não o *perfeito e caro*. O A\* é celebrado justamente por oferecer o melhor equilíbrio conhecido entre as duas exigências — e por permitir, quando preciso, **trocar deliberadamente** um pouco de otimalidade por muito mais velocidade, como veremos ao discutir heurísticas.
 
 A abordagem ingênua — testar todos os caminhos possíveis e escolher o mais barato — é inviável: o número de caminhos cresce **exponencialmente** com o tamanho do grafo. Precisamos de um método que encontre o melhor caminho **sem** enumerar todos. A família de algoritmos que faz isso é a da **busca em grafos**, e para entender o A\* precisamos primeiro entender seu antecessor direto.
@@ -38,7 +38,7 @@ Em 1959, Edsger Dijkstra publicou um algoritmo que resolve o problema do caminho
 
 O comportamento visual de Dijkstra é o de uma **mancha que se espalha uniformemente** a partir da origem, como ondas concêntricas em um lago, crescendo em todas as direções até tocar o destino. E aqui está sua fraqueza para jogos: **Dijkstra não sabe onde fica o destino**. Ele explora com o mesmo entusiasmo o nó que fica na direção do alvo e o que fica exatamente na direção oposta. É uma busca **não-informada** (ou "cega"): usa apenas a informação do custo *já percorrido*, nada sobre o que *ainda falta*. Num mapa grande, isso significa examinar uma quantidade enorme de nós irrelevantes antes de alcançar o objetivo — desperdício que um jogo em tempo real não pode pagar.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Dijkstra **não é** um algoritmo ruim — ele é ótimo e continua sendo a escolha certa em situações específicas: quando **não há um destino único** (por exemplo, "qual a distância deste ponto a *todos* os outros?", útil em mapas de influência da Parte IV), ou quando não existe uma boa maneira de estimar a distância ao alvo. O ponto não é que Dijkstra seja inferior, mas que, **quando conhecemos o destino**, estamos jogando fora uma informação preciosa ao não usá-la. É exatamente essa informação desperdiçada que o A\* recupera.
 
 ### A ideia da heurística e a busca informada
@@ -49,7 +49,7 @@ Uma busca que usa uma heurística para se orientar é chamada de **busca informa
 
 Um exemplo torna a ideia concreta. Num mapa em grade, uma heurística natural para o custo restante de um nó até o destino é a **distância em linha reta** (ou a distância em número de células) entre eles, **ignorando os obstáculos**. Essa estimativa é fácil de calcular (pura geometria) e, embora possa **subestimar** o custo real (o caminho de fato terá de contornar paredes), ela nunca o **superestima** — propriedade que, como veremos na seção 8.2.2, é a chave de tudo.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Achar que a heurística "decide o caminho" ou que precisa ser exata. A heurística **não** escolhe o caminho; ela apenas **ordena a exploração**, dizendo ao algoritmo qual nó parece mais promissor examinar em seguida. Uma heurística imperfeita (que subestima) ainda leva o A\* ao caminho ótimo — apenas o faz examinando mais ou menos nós conforme sua qualidade. Confundir "guiar a busca" com "determinar a resposta" é um mal-entendido frequente que atrapalha a compreensão do algoritmo.
 
 ### 8.2.1 Custo g, heurística h e função f
@@ -88,10 +88,10 @@ O exemplo canônico de heurística admissível é a **distância em linha reta**
 
 Toda heurística consistente é admissível, mas nem toda admissível é consistente. Felizmente, as heurísticas geométricas usadas em jogos (Manhattan, Euclidiana, Chebyshev, que veremos na seção 8.3.2) são, na prática, **consistentes** — o que explica por que implementações de A\* em jogos raramente se preocupam em reabrir nós fechados.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > A distinção entre admissível e consistente costuma parecer abstrata, mas tem uma consequência concreta de implementação. Se sua heurística é apenas admissível (não consistente), o A\* pode, em raras situações, encontrar um caminho melhor para um nó **já fechado** e precisará **reabri-lo** para propagar a melhoria — caso contrário, o resultado pode não ser ótimo. Com heurística **consistente**, isso nunca acontece, e você pode ignorar com segurança qualquer nó já na lista fechada. Como as heurísticas geométricas comuns são consistentes, a maioria dos tutoriais de jogos omite o reprocessamento — o que é correto *naquele contexto*, mas não em geral.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao projetar uma heurística, mantenha-a **admissível** para preservar a otimalidade e o mais **próxima possível** do custo real para maximizar a eficiência (menos nós expandidos). Há uma tensão elegante aqui: a heurística "perfeita" seria o próprio custo ótimo restante — mas calculá-la seria tão caro quanto resolver o problema. A arte está em encontrar uma estimativa **barata de calcular** e ao mesmo tempo **informativa**. Toda a seção 8.3.2 é sobre esse equilíbrio.
 
 ---
@@ -140,7 +140,7 @@ função A*(origem, destino):
 
 Note o coração do algoritmo: para cada vizinho do nó atual, calcula-se o custo de alcançá-lo **passando pelo atual** (`custoTentativa`); se esse custo for **melhor** do que o melhor conhecido até então para aquele vizinho, atualiza-se seu `g`, seu `f` e seu predecessor. Essa operação — chamada de **relaxamento** da aresta, no vocabulário de Cormen et al. — é a mesma de Dijkstra; a única diferença do A\* é que a **ordem de expansão** é ditada por `f = g + h`, e não apenas por `g`.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A eficiência do A\* depende criticamente da estrutura de dados da lista aberta. Uma implementação ingênua que percorre toda a lista para achar o menor `f` a cada passo custa caro; uma **fila de prioridade** (heap binário) reduz drasticamente esse custo e é o padrão. Em motores profissionais, otimizam-se ainda mais essas estruturas (heaps especializados, buckets de custo), porque o pathfinding é chamado tantas vezes por segundo que cada microssegundo economizado no gerenciamento da lista aberta se multiplica por milhares.
 
 [DIAGRAMA]
@@ -160,12 +160,12 @@ A qualidade da heurística determina quantos nós o A\* expande — e, portanto,
 
 **Distância de Chebyshev (e a "octile").** Para grades de **conectividade-8** com custo diagonal igual ao ortogonal, a distância de Chebyshev — `h = máx(|x₁ − x₂|, |y₁ − y₂|)` — é a medida exata (o número de passos, já que a diagonal cobre avanço em ambos os eixos de uma vez). Quando o custo diagonal é o correto `√2`, usa-se a variante **octile**, que pondera adequadamente os trechos diagonais e ortogonais e é a heurística **exata e admissível** para movimento em 8 direções — a escolha ideal para a maioria das grades de jogo.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > **Casar a heurística errada com a conectividade da grade.** Usar Manhattan numa grade de 8 direções superestima o custo restante, tornando a heurística **inadmissível** — e o A\* pode devolver um caminho **não ótimo**. Usar Euclidiana numa grade de 8 direções é admissível, mas **subestima**, fazendo o algoritmo trabalhar mais do que precisa. A regra prática: **conectividade-4 → Manhattan; conectividade-8 → octile (Chebyshev ponderada); movimento livre/NavMesh → Euclidiana.** Errar esse casamento é uma das causas mais comuns de pathfinding lento ou de caminhos estranhos.
 
 **O impacto da heurística — e o truque do "peso".** Quanto mais a heurística se aproxima do custo real (sem superestimá-lo), menos nós o A\* expande e mais rápido ele termina. No extremo, uma heurística nula (`h = 0`) reduz o A\* a Dijkstra, expandindo o máximo de nós. Há ainda um recurso pragmático importantíssimo na indústria: **multiplicar a heurística por um peso** maior que 1 (o chamado **A\* ponderado**, ou *weighted A\**). Isso a torna **deliberadamente inadmissível** — ela passa a superestimar — e o algoritmo fica **muito mais rápido**, correndo com mais agressividade rumo ao alvo, ao custo de **abrir mão da garantia de otimalidade** (o caminho pode ficar um pouco mais longo). Em muitos jogos, esse é um negócio excelente: um caminho 5% mais longo calculado na metade do tempo é, frequentemente, a escolha profissional correta. É a materialização, no nível do algoritmo, da tese de que a IA de jogos prefere o *convincente e barato* ao *perfeito e caro*.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > O A\* ponderado (*weighted A\**) é um dos segredos abertos do pathfinding comercial. Estúdios ajustam o peso da heurística como um **dial** entre qualidade e desempenho: quando há muitos agentes buscando ao mesmo tempo e o orçamento de quadro aperta, aumenta-se o peso para acelerar; quando a qualidade do caminho é crítica e há folga de tempo, aproxima-se de 1 para recuperar a otimalidade. Essa sintonia fina, invisível ao jogador, é parte do ofício de um programador de IA — e um bom exemplo de como um parâmetro matemático simples vira uma alavanca de design.
 
 [DIAGRAMA]
@@ -181,7 +181,7 @@ Quando o A\* retira o **destino** da lista aberta, a busca termina — mas o res
 
 Essa etapa é barata — percorre apenas os nós do caminho final, não todos os explorados — e elegante: toda a informação necessária já foi registrada como efeito colateral do relaxamento das arestas. É por isso que guardar o predecessor a cada melhoria de `g` (na seção 8.3.1) não era um detalhe, mas parte essencial do projeto do algoritmo.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Separe mentalmente **três produtos** de uma busca A\*: (1) o **conjunto de nós explorados** (aberta + fechada), que mede o *esforço* gasto; (2) o **encadeamento de predecessores**, que é a *memória* de como cada nó foi alcançado; e (3) o **caminho final reconstruído**, que é a *resposta* entregue ao agente. Confundir "nós explorados" com "caminho" é um erro conceitual comum — o A\* costuma explorar muito mais nós do que os que aparecem no caminho devolvido, e a diferença entre esses dois números é justamente o que as otimizações do Capítulo 9 buscam reduzir.
 
 ---
@@ -196,7 +196,7 @@ Ao encontrar a **parede**, algo revelador acontece: os nós logo atrás dela tê
 
 Esse traço ilustra o comportamento característico do A\*: **eficiente e direto em terreno aberto** (a heurística poda quase tudo), **mais trabalhoso perto de obstáculos** (onde a heurística "mente" ao sugerir direções bloqueadas), mas sempre **correto e ótimo** (sob heurística admissível). Também antecipa a motivação do Capítulo 9: em grades grandes e abertas, o A\* ainda expande **muitos nós redundantes** — vizinhos equivalentes que levam ao mesmo lugar —, e é essa redundância que o Jump Point Search atacará.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Se você já jogou um RTS e mandou uma unidade para o outro lado do mapa, deve ter notado que, às vezes, ela hesita ou faz um pequeno desvio ao contornar uma construção. O que você viu foi, muito provavelmente, o A\* "descobrindo" em tempo real que a direção mais curta em linha reta estava bloqueada e recalculando o contorno. Esse comportamento não é um defeito — é a assinatura visível de uma busca informada lidando com a diferença entre a **distância geométrica** (o que a heurística estima) e a **distância real navegável** (o que o grafo impõe).
 
 [DIAGRAMA]
@@ -214,7 +214,7 @@ Elementos obrigatórios: grade com parede e passagem única; células coloridas 
 
 **Limitações.** O A\* guarda `g`, `f` e predecessor para **cada nó tocado**, então seu **consumo de memória** cresce com o número de nós explorados — um problema real em grades muito finas ou mundos enormes. Seu **tempo de execução**, embora muito melhor que o de Dijkstra, ainda pode ser proibitivo quando **muitos agentes** buscam simultaneamente em grafos grandes. Em grades uniformes e abertas, ele desperdiça trabalho explorando **nós simétricos** (rotas equivalentes que chegam ao mesmo ponto) — a ineficiência que motiva o Capítulo 9. O A\* clássico calcula um caminho **estático**: se o mundo muda (uma ponte desaba, um obstáculo surge), é preciso **recalcular** — o que originou variantes dinâmicas como o **D\*** e o **D\* Lite**, usadas em robótica e em alguns jogos. E o caminho que ele devolve, especialmente em grades, tende a ter aparência **"quadriculada"** e a "colar" nas quinas, exigindo a **suavização** que estudaremos no Capítulo 9.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Uma limitação frequentemente subestimada é o **custo de memória por agente**. Em um RTS com centenas de unidades pedindo caminho ao mesmo tempo, não é o tempo de uma única busca que preocupa, mas a **soma** de todas elas e a memória temporária que cada uma consome. Por isso, motores comerciais raramente deixam cada agente rodar um A\* completo e independente a cada quadro: eles **enfileiram** requisições, **compartilham** resultados entre agentes com destinos próximos, **fatiam** buscas longas em vários quadros (*time-slicing*) e **reaproveitam** caminhos. O A\* é o núcleo, mas ao redor dele há toda uma engenharia de orçamento — tema que o Capítulo 9 aprofunda.
 
 ---
@@ -229,7 +229,7 @@ Nos **jogos de ação e tiro** — de clássicos como *F.E.A.R.* aos títulos 3D
 
 Em praticamente **todo jogo 3D com NPCs que se deslocam** — incluindo os grandes títulos de mundo aberto e narrativos, como *The Last of Us* —, é um A\* sobre NavMesh, encapsulado no equivalente ao **NavMesh Agent**, que garante que companheiros e inimigos cheguem aonde precisam sem atravessar paredes.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Um ponto de honestidade profissional, alinhado à cautela da apostila: raramente um estúdio publica "usamos A\* com heurística octile e peso 1,3". O que sabemos é que o A\* é o **padrão de fato** e que os sistemas oficiais de navegação (Unity, Unreal) o implementam por baixo. Quando atribuímos A\* a um jogo específico, fazemos uma **inferência técnica fundamentada** na estrutura observável do movimento (contorno de obstáculos, caminhos próximos do ótimo, comportamento em recálculo), não uma afirmação documentada — a mesma distinção entre *fato* e *análise* que praticaremos na engenharia reversa da Parte VII.
 
 ---
@@ -240,7 +240,7 @@ Como no Capítulo 7, o objetivo aqui é **conceitual**, não um passo a passo. N
 
 Quando é preciso **controle direto** sobre o A\* — tipicamente em jogos baseados em **grade** (estratégia, 2D, tower defense) ou que exigem **atualização dinâmica** intensa —, a biblioteca de terceiros mais usada no ecossistema Unity é o **A\* Pathfinding Project**, de Aron Granberg. Ela expõe o algoritmo sobre grades, grafos de pontos e malhas, permite ajustar heurística e conectividade, e implementa otimizações modernas (incluindo variantes hierárquicas e multithreading) — sendo a escolha natural de projetos cujo mundo é melhor descrito por uma grade do que por uma NavMesh. No código aberto, o par **Recast & Detour** oferece o **Detour** como o componente que realiza a busca (um A\* sobre a malha do Recast), usado diretamente por equipes com tecnologia própria.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Antes de escrever seu próprio A\*, pergunte-se se o problema **realmente** exige isso. Para movimento 3D padrão, o NavMesh Agent já entrega um A\* robusto e testado; reinventá-lo raramente compensa. Implementar o A\* "na mão" faz sentido em três situações: (1) para **aprender** — e todo estudante de IA de jogos deveria fazê-lo ao menos uma vez, para desmistificar o algoritmo; (2) quando a representação é uma **grade** que o sistema nativo não cobre bem; (3) quando se precisa de **controle fino** (heurística customizada, custos dinâmicos complexos, *time-slicing* sob medida). Fora desses casos, usar a implementação madura da ferramenta é a decisão profissional.
 
 ---

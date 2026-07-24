@@ -8,7 +8,7 @@ Este capítulo trata da técnica clássica que responde a essa segunda pergunta 
 
 Fiel à estrutura da apostila, partimos do **problema** de design (uma IA que precisa decidir *onde* agir), construímos o **conceito** de campo escalar sobre o mapa, detalhamos o **funcionamento** (fontes, propagação, decaimento, combinação de camadas e atualização em tempo real), aterrissamos em **exemplos** concretos e nos **jogos** que os popularizaram, pesamos **vantagens e limitações**, e fechamos com as **ferramentas** — incluindo a comparação esclarecedora com o **EQS** da Unreal e a discussão de por que a Unity não oferece um sistema nativo dedicado. Ao final, o leitor terá no repertório a ferramenta central do **raciocínio espacial e tático**, e verá que ela é a ponte natural entre a Parte III (movimento) e a Parte V (decisão adversarial): o mapa de influência é, no fundo, uma **função de avaliação espacial**, e essa ideia reaparecerá com força no Minimax do Capítulo 11.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > A ideia de sobrepor um "campo de valores" ao terreno para orientar decisões é antiga e tem raízes fora dos jogos — na análise militar e na cartografia tática, onde mapas de controle territorial e de ameaça são usados há muito tempo. Nos jogos digitais, os mapas de influência ganharam corpo com os jogos de estratégia em tempo real dos anos 1990, quando a IA precisava, pela primeira vez, avaliar mapas grandes e decidir onde atacar, defender e expandir. O termo consolidou-se na literatura técnica com autores como **Steve Rabin** (série *Game AI Pro*) e **Ian Millington** (*AI for Games*), que sistematizaram o método e o apresentaram como a ferramenta padrão de raciocínio tático — o complemento espacial do pathfinding. É um daqueles conceitos que, uma vez compreendido, o estudante passa a reconhecer em praticamente todo jogo de estratégia que já jogou.
 
 ---
@@ -25,7 +25,7 @@ Comecemos, como sempre, por situações concretas de desenvolvimento — problem
 
 O que essas três situações têm em comum? Todas são **decisões espaciais**: a resposta não é uma ação abstrata ("atacar", "fugir"), mas uma **posição** ou uma **região** do mapa. E todas dependem não de um único fator, mas da **combinação** de múltiplos fatores distribuídos pelo espaço — a posição de aliados e inimigos, a geometria das coberturas, o valor dos recursos, a proximidade do perigo. Programar cada uma dessas decisões "à mão", com uma cascata de `if`s comparando distâncias e ângulos par a par, é possível para casos pequenos, mas **não escala**: cada nova fonte de consideração multiplica a complexidade do código, e o resultado é frágil, difícil de ajustar e específico demais para reaproveitar.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O sintoma clássico de que um problema pede mapa de influência é a frase "a IA precisa escolher a melhor posição considerando *várias coisas ao mesmo tempo*". Se você se pega escrevendo laços aninhados que, para cada candidato de posição, comparam distância ao inimigo, distância ao aliado, exposição, valor do terreno e mais meia dúzia de fatores — e depois precisa **ponderar** tudo isso num único número —, você está reimplementando, de forma ad hoc, aquilo que o mapa de influência resolve de maneira estruturada e reaproveitável. Reconhecer o padrão cedo evita meses de código tático emaranhado.
 
 A raiz do problema é conceitual: o pathfinding raciocina sobre **conexões** (como os lugares se ligam), mas essas decisões exigem raciocinar sobre **qualidades do espaço** (o que cada lugar *vale*, taticamente). São dois tipos diferentes de conhecimento espacial. O Capítulo 7 nos deu a representação das **conexões** — o grafo navegável. Falta uma representação das **qualidades** — e é exatamente isso que o mapa de influência fornece.
@@ -49,7 +49,7 @@ O nome "mapa de influência" vem do uso original mais comum: medir a **influênc
 
 Mas "influência militar" é apenas **um** uso. O poder da técnica está em sua **generalidade**: o mesmo mecanismo — atribuir valores ao espaço e deixá-los se espalhar — serve para representar **qualquer** qualidade espacial. Um campo pode medir perigo, outro pode medir visibilidade, outro pode medir proximidade de recursos, outro pode medir o "cheiro" deixado pelo jogador que passou por ali. Cada um desses é uma **camada** (ou **canal**) de influência, e o raciocínio tático sofisticado nasce de **combinar** várias camadas — assunto da Seção 10.2.2.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > É comum confundir o mapa de influência com o mapa de navegação (grade/NavMesh do Capítulo 7). Eles frequentemente **compartilham a mesma grade** como suporte, mas guardam informações de natureza distinta. A grade de navegação responde "esta célula é caminhável e a quais outras se conecta?" — informação **topológica**, sobre movimento. O mapa de influência responde "quanto vale, taticamente, estar nesta célula?" — informação **avaliativa**, sobre decisão. Uma célula perfeitamente caminhável (ótima para a navegação) pode ter valor tático péssimo (bem no meio da linha de fogo inimiga). Manter clara essa separação — **onde posso ir** versus **onde vale a pena ir** — é a chave para não misturar os dois sistemas.
 
 ### 10.2.1 Fontes de influência, propagação e decaimento
@@ -68,7 +68,7 @@ A primeira é a **fórmula direta**: para cada célula, soma-se a contribuição
 
 A segunda é a **propagação iterativa** (por vizinhança): parte-se das células-fonte com sua intensidade máxima e, em passos sucessivos, cada célula "vaza" para as vizinhas uma fração do próprio valor (multiplicada pelo fator de decaimento), repetindo até o campo estabilizar ou por um número fixo de iterações. Essa forma é mais barata e naturalmente respeita **obstáculos** — se a propagação segue as conexões da grade navegável, a influência **contorna paredes** em vez de atravessá-las, produzindo um campo que reflete a **distância real de caminhada**, não a distância em linha reta. Essa é uma vantagem tática importante: o perigo de um inimigo do outro lado de um muro é (corretamente) baixo, mesmo que ele esteja perto em linha reta.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Decaimento em linha reta versus decaimento pela grade navegável é uma distinção que costuma confundir. Se a influência decai pela **distância euclidiana** (linha reta), ela "atravessa" paredes: um inimigo do outro lado de um muro parece perigoso, embora não possa te alcançar. Se decai pela **distância de caminhada** (propagando célula a célula pelas conexões navegáveis, como no Capítulo 7), a influência **contorna** obstáculos e reflete a ameaça real. Para raciocínio tático fiel, quase sempre se quer o segundo comportamento — e é por isso que a propagação iterativa sobre a grade navegável é tão popular: ela herda "de graça" a topologia do mundo.
 
 O pseudocódigo a seguir ajuda a fixar o mecanismo da propagação iterativa:
@@ -122,7 +122,7 @@ As camadas e combinações mais úteis na prática são:
 
 A combinação dessas camadas é o que produz o raciocínio tático de fato. Um exemplo típico de "campo de decisão" para escolher **onde atacar** poderia ser: *procurar a célula que maximiza a vulnerabilidade inimiga (alvo fraco) e ao mesmo tempo minimiza a ameaça a mim (não é uma armadilha) e está próxima dos meus reforços (posso ser apoiado)*. Cada um desses três critérios é uma camada; o campo final é uma combinação ponderada delas, e a decisão vira, de novo, "escolher a célula de maior valor no campo combinado".
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A combinação de camadas costuma ser uma **soma ponderada**: `decisão = pesoA × camadaA + pesoB × camadaB − pesoC × camadaC …`, onde os pesos codificam a "personalidade" ou a "doutrina" da IA. Uma IA agressiva dá peso alto à vulnerabilidade inimiga e baixo à própria segurança; uma IA cautelosa faz o oposto. O belo desse arranjo é que **ajustar o comportamento tático da IA vira ajustar números**, não reescrever lógica — os designers podem afinar a agressividade sem tocar no código, exatamente o tipo de **controle de autoria** que valorizamos desde o Capítulo 1. Essa mesma ideia de "somar considerações ponderadas para escolher a melhor opção" é o coração da **IA de utilidade** que vimos no Capítulo 6: o mapa de influência é, em boa medida, IA de utilidade aplicada ao **espaço**.
 
 [DIAGRAMA]
@@ -156,10 +156,10 @@ O ponto crítico está no passo 2, e as técnicas para torná-lo viável são o 
 
 **Resolução reduzida.** Nem sempre o mapa de influência precisa da mesma resolução da grade de navegação. Um campo tático pode usar uma grade **mais grossa** (cada célula de influência cobrindo várias células de navegação), reduzindo o número de células a atualizar por um fator quadrático. A perda de precisão costuma ser aceitável — decisões táticas raramente dependem da célula exata, e sim da **região**.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Case a **frequência de atualização** e a **resolução** do mapa de influência com a **velocidade e a granularidade das decisões** que ele alimenta. Um RTS que decide estratégia a cada segundo não ganha nada atualizando o campo 60 vezes por segundo — só desperdiça CPU. Um mapa de perigo para esquiva em um jogo de ação rápido pode precisar de atualização mais frequente, mas provavelmente cobre uma área pequena. A pergunta orientadora é sempre a mesma: *qual é a decisão mais rápida e mais fina que este campo precisa suportar?* — e dimensione o campo para isso, nem mais, nem menos. Superdimensionar o mapa de influência é um dos desperdícios de CPU mais comuns em IA tática.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Recalcular o mapa de influência inteiro, do zero, a cada quadro. É a implementação ingênua que "funciona" no protótipo com dez unidades e num mapa pequeno — e que **derrete o desempenho** assim que o mapa cresce ou as unidades se multiplicam, exatamente quando o mapa de influência seria mais útil. O custo de atualização cresce com o número de células **e** com a frequência; ignorar isso é assinar um cheque que o orçamento de quadro não pode pagar. As três defesas — baixa frequência, atualização incremental e resolução adequada — não são "otimizações avançadas opcionais": são parte do **design correto** da técnica desde o início.
 
 [IMAGEM NECESSÁRIA]
@@ -185,10 +185,10 @@ Vejamos a técnica em ação, retomando as situações da Seção 10.1 e amplian
 
 **Controle territorial.** Em jogos de estratégia, o campo de **controle** (Seção 10.2.2) alimenta decisões de alto nível: onde construir a próxima base (em território seguro, longe da fronteira), onde posicionar defesas (na fronteira, onde o controle está disputado), quando recuar (quando o controle de uma região vira negativo). O mesmo campo, combinado de formas diferentes, sustenta decisões econômicas, defensivas e ofensivas — um único sistema alimentando toda a "consciência espacial" da IA.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Uma técnica poderosa e barata é a **descida (ou subida) de gradiente** sobre o campo. Em vez de rodar um pathfinding completo para "fugir do perigo" ou "avançar para a oportunidade", o agente apenas olha as células vizinhas e caminha na direção que mais melhora seu valor no campo — subindo rumo às oportunidades ou descendo rumo à segurança. É um movimento **reativo, local e extremamente barato**, que produz trajetórias sensatas sem qualquer busca global. A limitação clássica é ficar preso em **mínimos/máximos locais** (um "vale" cercado por perigo, do qual todo passo imediato piora a situação) — um problema que veremos ecoar em outras técnicas de otimização, e que costuma ser mitigado combinando o gradiente com o pathfinding tradicional para saídas de longo alcance.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Os mapas de influência raramente decidem **sozinhos** — eles **alimentam** as outras técnicas da apostila. Numa arquitetura típica de IA de jogo, o mapa de influência fornece a **avaliação espacial** (onde é bom/ruim), uma **árvore de comportamento** ou **FSM** (Parte II) decide **o que fazer** com base nessa avaliação ("se minha posição é perigosa demais, buscar cobertura"), e o **pathfinding** (Parte III) executa o deslocamento até a célula escolhida. Os sistemas não competem: eles se **encaixam**, cada um respondendo à pergunta que sabe responder. Reconhecer essa divisão de trabalho — avaliar, decidir, mover — é um dos aprendizados mais transferíveis desta apostila.
 
 ---
@@ -207,10 +207,10 @@ Vejamos a técnica em ação, retomando as situações da Seção 10.1 e amplian
 
 **Escalabilidade.** As três limitações acima se **multiplicam**: um mapa grande, com muitas camadas, atualizado com frequência, pode facilmente estourar tanto CPU quanto memória. A escalabilidade do mapa de influência é, portanto, um equilíbrio delicado entre **tamanho do mapa**, **número de camadas**, **resolução** e **frequência** — e é raro poder maximizar os quatro.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Uma limitação **conceitual**, e não apenas de custo: o mapa de influência é excelente para decisões **espaciais** e **agregadas** ("qual região é melhor?"), mas **não** substitui o raciocínio sobre **entidades individuais** e **sequências de ações**. Ele diz "esta área é perigosa", não "aquele atirador específico vai recarregar em 2 segundos, então avance agora". Para lógica individual, temporal ou sequencial, continuam necessárias as FSMs, árvores de comportamento e planejamento da Parte II. O mapa de influência é uma **camada de percepção tática do espaço**, não um cérebro completo — e tratá-lo como se fosse leva a IAs que "entendem" o mapa mas não sabem o que fazer momento a momento.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Comece **simples e barato**, e só refine sob medição. Uma única camada de influência, em grade grossa, atualizada duas vezes por segundo, já resolve uma quantidade surpreendente de problemas táticos — e é fácil de depurar. Adicione camadas, aumente a resolução ou a frequência **apenas** quando um comportamento observável exigir e o perfil de desempenho permitir. Como em toda a Parte III, a regra é **medir antes de otimizar** (e antes de sofisticar): a complexidade do mapa de influência deve ser puxada pela necessidade real do jogo, não empurrada pela vontade de usar todos os recursos da técnica.
 
 ---
@@ -227,7 +227,7 @@ Como em toda a apostila, a ressalva vale: salvo quando a equipe documentou publi
 
 De modo geral, **qualquer jogo de estratégia** com decisões sobre território — de tower defenses (onde posicionar torres para cobrir caminhos) a *4X* (explorar, expandir, explorar, exterminar) — é candidato natural. E o uso não se restringe à estratégia: jogos de **ação tática** e **tiro** usam mapas de perigo e de cobertura (versões locais e menores da mesma ideia) para posicionar inimigos de forma crível — assunto que reencontraremos, sob a ótica de sensoriamento e posicionamento, nos estudos de caso da Parte VII.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A ideia de "campo que se propaga pelo espaço navegável e guia o movimento" reaparece, com outro nome, na técnica de **flow field** (campo de fluxo) que vimos no Capítulo 9 para mover multidões. Não é coincidência: ambos são campos escalares/vetoriais sobre a grade, calculados por propagação a partir de fontes/destinos. Um mapa de perigo cujo **gradiente** aponta para a segurança é, essencialmente, um flow field de fuga. Reconhecer que técnicas de capítulos diferentes compartilham a mesma raiz matemática — propagar valores por um grafo — é um sinal de maturidade conceitual, e explica por que engines que já têm flow fields conseguem reaproveitar boa parte da infraestrutura para mapas de influência.
 
 ---
@@ -250,10 +250,10 @@ A distinção é conceitualmente rica e vale internalizar: o **mapa de influênc
 
 **Soluções de terceiros.** No ecossistema Unity, há *assets* da **Asset Store** que oferecem implementações de mapas de influência e de sistemas de consulta ambiental inspirados no EQS, poupando a escrita da infraestrutura básica. Eles são úteis como ponto de partida, mas — coerente com a filosofia da apostila — devem ser avaliados pelas mesmas perguntas de sempre: que **representação** suportam, que **camadas** e **combinações** permitem, como fazem a **atualização** (frequência, incremental, *time-slicing*) e a que **custo**. Nenhum deles é uma "solução oficial", e a compreensão conceitual do capítulo é o que permite julgá-los.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A ausência de um sistema nativo de mapas de influência na Unity **não** significa que a técnica seja marginal — significa que ela é, por natureza, **artesanal e específica do jogo**. Estúdios que fazem estratégia constroem seus próprios sistemas de influência sob medida, afinados para o seu mapa e o seu ritmo, e tratam esse sistema como um **diferencial** da IA do jogo. A lição de carreira é clara: dominar o **conceito** (este capítulo) vale mais do que dominar qualquer botão de qualquer engine, porque é o conceito que você levará de um projeto a outro, de uma ferramenta a outra — inclusive para engines que ainda nem existem.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao construir um mapa de influência na Unity, **separe** desde o início três responsabilidades: (1) a **representação** do campo (a estrutura de dados das camadas, idealmente amigável ao Job System/Burst para escalar); (2) a **atualização** (o serviço que coleta fontes, propaga, decai e combina, com sua política de frequência e *time-slicing*); e (3) o **consumo** (como os agentes leem o campo para decidir). Manter esses três blocos desacoplados torna o sistema testável (você pode visualizar o campo isoladamente, como no debug da Seção 10.3), ajustável (designers mexem nos pesos sem tocar na propagação) e reaproveitável entre projetos — exatamente as qualidades de engenharia que distinguem um sistema tático profissional de um protótipo emaranhado.
 
 ---

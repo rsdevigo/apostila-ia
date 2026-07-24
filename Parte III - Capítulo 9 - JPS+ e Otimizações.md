@@ -8,7 +8,7 @@ Este capítulo é sobre **ir além do A\* sem abandoná-lo**. Nenhuma das técni
 
 Mas há uma lição tão importante quanto os algoritmos, e a apostila insiste nela desde já: **otimização não é gratuita e nem sempre é apropriada**. Cada técnica deste capítulo compra velocidade com alguma moeda — restrição de aplicabilidade, custo de pré-processamento, memória adicional, tempo de construção, dificuldade de atualização dinâmica. O profissional maduro não é quem aplica a otimização mais sofisticada, mas quem sabe **quando ela rende ganhos reais e quando é esforço desperdiçado**. Fiel à estrutura da apostila, partimos do **problema** (o A\* é caro em grades grandes), construímos os **fundamentos** do JPS e do JPS+, comparamos **desempenho** com o A\*, apresentamos as **demais otimizações**, pesamos **vantagens e limitações**, e aterrissamos nas **aplicações**, **jogos** e **ferramentas**. Ao final, o leitor terá não só mais algoritmos no repertório, mas o **critério** para escolher entre eles.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > O Jump Point Search é surpreendentemente recente para um tema tão maduro quanto o pathfinding. Foi apresentado em 2011 por **Daniel Harabor** e **Alban Grastien**, pesquisadores australianos, num artigo que mostrava como podar simetrias em grades uniformes e alcançar acelerações de uma ordem de magnitude sobre o A\* — **sem** abrir mão da otimalidade. Poucos anos depois, **Steve Rabin** e **Nathan Sturtevant** popularizaram na indústria a variante **JPS+**, com pré-processamento, e a combinaram com *Goal Bounding* para ganhos ainda maiores, documentando-a na série *Game AI Pro*. É um raro exemplo de avanço acadêmico que migrou rapidamente para a prática comercial — e uma prova de que até algoritmos "resolvidos" como a busca em grade ainda guardavam ganhos expressivos a descobrir.
 
 ---
@@ -21,7 +21,7 @@ O problema tem um nome: **simetria de caminhos**. Numa grade sem obstáculos, ex
 
 Esse desperdício é invisível em grades pequenas, mas cresce com a área. Numa grade de 1000×1000 células (um milhão de nós) — nada absurdo para um jogo de estratégia ou um mundo aberto —, uma única busca do A\* pode expandir **dezenas ou centenas de milhares** de nós, a maioria deles explorando simetrias inúteis. Multiplique isso por dezenas de agentes buscando por quadro, e o orçamento de 16 milissegundos evapora.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A simetria de caminhos é fácil de ver com um experimento mental. Imagine o A\* buscando num campo totalmente aberto, sem nenhum obstáculo, do canto ao centro. O caminho ótimo é trivial — uma reta diagonal —, mas o A\* não "sabe" que é trivial: ele expande um **leque** gordo de nós em torno da diagonal, porque todos têm `f` empatado ou quase. Todo esse trabalho produz uma resposta que poderíamos ter dado de imediato. O JPS nasce exatamente desta observação: *em regiões abertas e uniformes, a maior parte da exploração do A\* é redundante e poderia ser "pulada".*
 
 O ponto crucial — e que orienta todo o capítulo — é que esse desperdício **só existe por causa da regularidade da grade**. Em um grafo irregular (waypoints, NavMesh), não há essa profusão de caminhos idênticos, e o A\* já é enxuto. Ou seja: a mesma regularidade que, no Capítulo 7, apontamos como **vantagem** da grade (grafo implícito, fácil atualização) é também a **origem** de sua ineficiência na busca — e, como veremos, a **chave** para otimizá-la. As técnicas deste capítulo exploram essa regularidade a seu favor.
@@ -44,7 +44,7 @@ Um **vizinho forçado** surge quando um **obstáculo** quebra a simetria. Consid
 
 O procedimento de **"pulo"** (*jumping*) formaliza isso. A partir de um nó, numa dada direção, o JPS avança célula a célula **sem parar**, enquanto: (a) não encontra o destino, (b) não encontra um nó com vizinhos forçados, e (c) — no caso de movimento diagonal — não encontra um ponto de onde partem "pulos" ortogonais produtivos. Ao encontrar qualquer uma dessas condições, ele para: aquele é o próximo jump point, e só ele é inserido na lista aberta, com o `g` correto (o custo acumulado ao longo de todo o trecho pulado). Todas as células intermediárias foram **atravessadas sem serem expandidas** — nunca entraram nas listas, nunca custaram gerenciamento de fila de prioridade.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > O JPS **não é uma heurística nem um algoritmo diferente do A\*** — é o **mesmo A\***, com a **mesma função `f = g + h`** e as **mesmas garantias de otimalidade**, apenas com uma **geração de sucessores** radicalmente mais esperta. Onde o A\* clássico pergunta "quais são os 8 vizinhos desta célula?", o JPS pergunta "quais são os próximos **pontos de decisão** alcançáveis a partir daqui, e a que custo?". A resposta a essa segunda pergunta contém muito menos nós, e é isso — e só isso — que acelera a busca. Compreender que JPS é "A\* com sucessores podados" evita o erro de tratá-lo como uma técnica exótica e desconexa.
 
 [DIAGRAMA]
@@ -68,10 +68,10 @@ Mas o pré-processamento tem um **preço**, e ele define exatamente onde o JPS+ 
 - **Custo de construção:** o pré-processamento leva tempo (feito no carregamento do nível, não deve pesar no jogo em execução — mas existe).
 - **Rigidez perante mudanças:** e aqui está a limitação decisiva — **se o mapa muda, a tabela fica inválida** e precisa ser recalculada. O JPS+ pressupõe um mundo **estático**. Num cenário onde o jogador constrói e destrói estruturas o tempo todo, ou onde obstáculos surgem e somem dinamicamente, o custo de reprocessar a tabela pode anular todo o ganho — ou inviabilizar a técnica.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Adotar JPS+ num jogo de mundo **dinâmico** (construção/destruição frequente, terreno mutável) e depois descobrir que o recálculo da tabela de saltos, disparado a cada mudança do mapa, custa mais do que se economizou na busca. O JPS+ brilha em mapas **estáticos e uniformes**; num mundo que muda a todo instante, o **JPS clássico** (sem pré-processamento) ou um **A\* bem otimizado** costumam ser escolhas mais seguras. Casar a técnica com a **dinâmica do mundo** é tão importante quanto casar a heurística com a conectividade (Capítulo 8).
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A escolha entre JPS, JPS+ e A\* é um exemplo perfeito da engenharia de *trade-offs* que caracteriza o desenvolvimento de jogos. Não há um "melhor algoritmo" universal: há o melhor algoritmo **para este mapa, esta dinâmica e este orçamento**. Equipes que trabalham com grades grandes e estáticas (muitos jogos de estratégia por turnos, tower defense, roguelikes de mapa fixo) colhem enormes ganhos do JPS+. Equipes com mundos 3D irregulares usam NavMesh + A\* e sequer têm uma grade onde aplicar JPS. Reconhecer a qual desses mundos o seu jogo pertence é a primeira — e mais importante — decisão de otimização.
 
 ---
@@ -97,7 +97,7 @@ Como produzir: Executar os três algoritmos sobre um conjunto de mapas de teste 
 Legenda sugerida: "Em grades grandes e abertas, JPS e JPS+ superam o A\* em ordens de magnitude; à medida que o mapa fica mais labiríntico, a vantagem diminui, pois surgem mais jump points e os pulos encurtam."
 [/IMAGEM NECESSÁRIA]
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Antes de investir em JPS+, **meça**. Otimização sem medição é adivinhação. Perfile o pathfinding do seu jogo: quantas buscas por segundo, em que tamanho de grade, com que densidade de obstáculos, com o mapa mudando com que frequência? Se o perfil revela **grades grandes, abertas e estáticas** com o pathfinding pesando no quadro, o JPS+ pode ser transformador. Se revela **mapas pequenos**, **muito obstruídos** ou **muito dinâmicos**, o esforço de implementação pode não se pagar — e um A\* com melhor gerenciamento de fila, *time-slicing* ou cache de caminhos pode render mais. A regra é a mesma de toda otimização: primeiro medir, depois otimizar o que realmente pesa.
 
 [DIAGRAMA]
@@ -119,7 +119,7 @@ O JPS+ ataca a simetria em grades. Mas a caixa de ferramentas da otimização de
 
 **Suavização de caminho (path smoothing).** Os caminhos que o A\*/JPS devolvem sobre uma grade têm aparência **"quadriculada"** e "colam" nas quinas, com viradas de 45° ou 90° que nenhum personagem real faria. A **suavização** é um pós-processamento que aproxima o caminho de algo natural. A técnica mais comum é o **teste de linha de visão** (*string pulling* / *funnel algorithm* em NavMeshes): percorre-se o caminho tentando "esticar um barbante" — se há linha de visão livre entre um ponto e um ponto mais adiante, os pontos intermediários entre eles são **descartados**, encurtando e retificando a rota. O resultado é um caminho com menos vértices e traçado mais direto, que o steering (a locomoção local, cujo conceito foi apresentado no Capítulo 7) percorre com curvas suaves. A suavização não altera *qual* rota global se toma — apenas **melhora sua aparência e naturalidade**, fechando a distância entre o caminho matemático e o movimento crível.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A suavização é o passo que costuma faltar em implementações amadoras e que mais impacta a **percepção de qualidade** da IA. Um caminho ótimo mas quadriculado faz o personagem parecer um robô seguindo trilhos; o mesmo caminho suavizado faz parecer que ele "decidiu" andar até ali. Como estamos no negócio da **ilusão de inteligência** (Parte I), esse ajuste estético não é secundário — é parte central de fazer o movimento convencer. Vale lembrar a divisão de trabalho: o **pathfinding** acha a rota, a **suavização** a refina, e o **steering** a percorre com um corpo que acelera, freia e curva de modo natural.
 
 [DIAGRAMA]
@@ -139,7 +139,7 @@ Consolidando os *trade-offs* deste capítulo:
 
 **Limitações.** O JPS e o JPS+ **exigem grade uniforme** — não se aplicam a NavMeshes nem a grafos irregulares de waypoints. O JPS+ pressupõe mapa **estático**; mundos dinâmicos invalidam a tabela de saltos. O ganho **desaparece em mapas labirínticos** (muitos obstáculos, poucos pulos longos). O pré-processamento custa **memória e tempo de construção**. O pathfinding hierárquico e os flow fields podem devolver caminhos **levemente subótimos** e adicionam **complexidade de implementação e manutenção** (construir e atualizar a hierarquia/o campo). E toda otimização acrescenta **código para manter e depurar** — um custo de engenharia que só se justifica quando o problema real o exige.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > A tentação de "otimizar por otimizar" é um erro clássico de engenharia, e o pathfinding é um campo fértil para ele. Implementar JPS+ num jogo cujo mapa é pequeno, ou cujo gargalo real está na física e não na busca, adiciona complexidade sem retorno — e complexidade é dívida técnica. A pergunta correta nunca é "qual é o algoritmo mais rápido?", mas "**o pathfinding é, comprovadamente por medição, um gargalo neste jogo — e, se é, qual otimização ataca a causa medida?**". Otimização é uma resposta a um problema medido, não um troféu a colecionar.
 
 ---
@@ -150,7 +150,7 @@ As otimizações deste capítulo encontram seu lar natural nos **jogos de estrat
 
 A **suavização de caminho**, por sua vez, é praticamente **universal**: qualquer jogo 3D com personagens que se movem — dos grandes títulos de ação e mundo aberto aos jogos independentes — aplica alguma forma de *string pulling* ou *funnel* para converter o caminho bruto da NavMesh em movimento crível. É a otimização que o jogador **nunca vê**, mas cuja ausência ele **sempre percebe** na forma de personagens que andam como robôs.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A GDC (Game Developers Conference) e a série de livros *Game AI Pro*, organizada por Steve Rabin, são as fontes onde a indústria documenta abertamente essas técnicas — incluindo a apresentação original do JPS+ com Goal Bounding e relatos de uso de flow fields e pathfinding hierárquico em jogos comerciais. Para o estudante que quiser ver esses algoritmos "na prática dos estúdios", e não apenas na teoria, essas coletâneas são a ponte direta entre a academia e o mercado — exatamente o tipo de fonte primária que retomaremos nos estudos de caso da Parte VII.
 
 ---
@@ -161,7 +161,7 @@ Na Unity, a **suavização de caminho** já está embutida no fluxo do **NavMesh
 
 Para **grades**, onde as técnicas deste capítulo mais rendem, recorre-se a terceiros. O **A\* Pathfinding Project** (Aron Granberg) suporta grades e oferece variantes otimizadas, incluindo **multithreading**, cache de caminhos e abordagens hierárquicas, sendo a escolha frequente de jogos de estratégia no ecossistema Unity. Implementações abertas de **JPS/JPS+** em C# estão disponíveis para integração direta em projetos baseados em grade, e a técnica de **flow field** é comumente implementada sob medida por estúdios de RTS, dada sua dependência das particularidades de cada jogo. No campo do código aberto para 3D, o **Detour** (par do Recast) já incorpora o *funnel* para suavização, novamente evidenciando que essas otimizações são parte madura e padronizada do ferramental de navegação.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao avaliar uma ferramenta de pathfinding, olhe além do "tem A\*?". Pergunte: **qual representação ela suporta** (grade, waypoints, NavMesh)? **Ela suaviza** os caminhos? **Oferece atualização dinâmica** eficiente e, se sim, a que custo? **Suporta multithreading ou time-slicing** para muitos agentes? **Traz otimizações** (hierarquia, JPS, flow field) que casam com o meu tipo de mapa? Essas perguntas — e não a mera presença do A\* — é que determinam se a ferramenta serve ao seu jogo. Elas são, no fundo, a aplicação prática de tudo o que esta Parte III ensinou.
 
 ---

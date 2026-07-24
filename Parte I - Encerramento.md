@@ -74,7 +74,7 @@ Para aprofundamento além do conteúdo desta Parte, recomendam-se as seguintes f
 - **RABIN, S. (org.).** *Game AI Pro 3.* — coletânea de artigos escritos por profissionais da indústria; excelente para conectar teoria e prática de mercado, a ser retomada em capítulos específicos.
 - Palestras técnicas da **GDC (Game Developers Conference)** sobre a IA de *Halo*, *F.E.A.R.* e *Left 4 Dead* — fontes primárias e documentadas dos estudos de caso citados nesta Parte (a serem aprofundados na Parte VII).
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao consultar as leituras complementares, mantenha em mente o mapa da seção 1.5: cada fonte tende a enfatizar uma parte do quadro (Russell & Norvig, a teoria de agentes; Millington, a engenharia de jogos; Rabin, a prática da indústria). Ler com esse mapa em mente ajuda a integrar as perspectivas em vez de tratá-las como visões concorrentes.
 
 ## Referências Bibliográficas desta Parte

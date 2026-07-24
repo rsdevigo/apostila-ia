@@ -8,7 +8,7 @@ Neste capítulo, invertemos essa relação. A **Aprendizagem por Reforço** (em 
 
 Fiéis à estrutura da apostila, partimos do **problema** de design — comportamentos que a equipe não consegue programar à mão — e da distinção fundamental entre **programar** e **aprender**. Construímos, com cuidado, os **conceitos** (agente, ambiente, estado, ação, recompensa, episódio, política, retorno acumulado e o dilema exploração/*exploitation*), formalizamos o cenário com os **Processos de Decisão de Markov (MDP)**, apresentamos as **funções valor** e, sobre tudo isso, o algoritmo central do capítulo: o **Q-Learning**, detalhado passo a passo. Como **aprofundamento**, veremos o **Deep Reinforcement Learning** e o DQN. Aterrissamos em **exemplos**, **aplicações**, **ferramentas** (com destaque para o **Unity ML-Agents**), **estudos de caso** documentados e uma discussão crítica de **vantagens e limitações** — sempre comparando com as técnicas baseadas em regras das Partes anteriores.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > A Aprendizagem por Reforço tem raízes que precedem em muito os jogos digitais. Suas origens estão em duas correntes distintas que convergiram: de um lado, a **psicologia comportamental** — os estudos de condicionamento de Edward Thorndike (a "lei do efeito", 1911) e de B. F. Skinner, segundo os quais comportamentos seguidos de consequências satisfatórias tendem a se repetir; de outro, o **controle ótimo** e a **programação dinâmica**, formalizados por **Richard Bellman** nos anos 1950, cuja célebre *equação de Bellman* é ainda hoje o coração matemático do campo. A síntese moderna veio nas décadas de 1980 e 1990, sobretudo no trabalho de **Richard Sutton** e **Andrew Barto**, cujo livro *Reinforcement Learning: An Introduction* se tornou a referência canônica. O algoritmo **Q-Learning** foi proposto por **Christopher Watkins** em 1989. O marco que projetou o RL ao grande público, porém, veio muito depois: em 2013–2015, a **DeepMind** mostrou um agente que aprendia a jogar dezenas de jogos do Atari 2600 **apenas olhando os pixels da tela e a pontuação** — o **DQN** —, e em 2016 o **AlphaGo** derrotou um dos maiores jogadores de Go do mundo, combinando RL com a busca em árvore que estudamos no Capítulo 11. De Skinner a AlphaGo, a ideia central nunca mudou: aprender **pela consequência das próprias ações**.
 
 ---
@@ -33,7 +33,7 @@ Ora, há situações em que esse pressuposto simplesmente não se sustenta. Cons
 
 Nesses casos, a pergunta de design deixa de ser "*qual regra eu escrevo?*" e passa a ser "*como faço a máquina descobrir a regra?*". É exatamente aqui que a Aprendizagem por Reforço entra.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Antes de qualquer entusiasmo, guarde este princípio de engenharia: **se você consegue programar o comportamento com uma FSM ou uma behavior tree, quase sempre deve fazê-lo.** RL só compensa quando programar à mão é genuinamente inviável ou proibitivamente caro. Um inimigo que patrulha, persegue e atira **não** precisa aprender nada — uma máquina de estados resolve com um décimo do esforço, total previsibilidade e nenhum custo de treinamento. Usar RL onde regras bastariam é o erro mais comum de quem acaba de descobrir o tema.
 
 ### Programar *versus* aprender pela interação
@@ -46,7 +46,7 @@ A distinção central deste capítulo pode ser resumida em duas maneiras opostas
 
 A palavra decisiva é *interação*. No aprendizado por reforço, o agente não recebe um "gabarito" com a ação correta para cada situação — ele recebe apenas um retorno avaliativo (recompensa) depois de agir, e precisa inferir, a partir dessa experiência acumulada, o que fazer.
 
-> **Atenção — RL não é aprendizado supervisionado**
+> ⚠️ **Atenção — RL não é aprendizado supervisionado**
 > É crucial não confundir aprendizado por reforço com **aprendizado supervisionado**, a forma de aprendizado de máquina mais conhecida. No aprendizado **supervisionado**, o sistema recebe um conjunto de exemplos **já rotulados com a resposta certa** ("esta imagem é um gato", "aquela é um cachorro") e aprende a reproduzir esses rótulos. Existe um professor que fornece a resposta correta para cada entrada. No aprendizado **por reforço**, **não há gabarito**: ninguém diz ao agente qual era a ação certa em cada momento; há apenas um sinal de recompensa, muitas vezes **esparso e atrasado** (a vitória só vem no fim da partida, depois de centenas de decisões). O agente precisa descobrir **sozinho** quais das suas muitas ações foram responsáveis pelo bom (ou mau) resultado — um problema conhecido como *atribuição de crédito*, que não existe no aprendizado supervisionado. Resumindo: no supervisionado aprende-se **a resposta certa**; no reforço aprende-se **a agir bem**, guiado apenas por recompensas.
 
 ### Exemplos de jogos onde RL se torna interessante
@@ -77,7 +77,7 @@ O **ambiente** é **tudo o que está fora do agente** e com que ele interage: o 
 
 A relação entre os dois é um **laço fechado**: o agente age sobre o ambiente, o ambiente muda e devolve informação ao agente, que age de novo. Reconheça aqui, de forma direta, o velho ciclo **Sentir–Pensar–Agir** da Parte I — o RL é uma teoria matemática precisa desse laço.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > A fronteira entre agente e ambiente nem sempre coincide com a fronteira "física" do personagem. Por convenção, **tudo o que o agente não pode controlar arbitrariamente faz parte do ambiente** — inclusive, por exemplo, o próprio corpo do personagem, seus músculos e sua energia, se o agente só pode influenciá-los indiretamente por meio de ações. O agente é estritamente o **tomador de decisão**; todo o resto é ambiente.
 
 ### Estado
@@ -98,10 +98,10 @@ A **recompensa** (*reward*) é um **número** que o ambiente devolve ao agente a
 
 A recompensa é o **coração** do RL: ela é a **única** forma pela qual o projetista comunica ao agente *o que se deseja que ele alcance*. Note a sutileza — o projetista não diz **como** fazer (isso o agente descobre), apenas **o que** é bom. Projetar boas recompensas (*reward shaping*) é, por isso, a arte central e a maior fonte de dificuldades práticas do RL.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Confundir **recompensa** com **comportamento**. A recompensa não descreve a ação desejada; descreve o **resultado** desejado. Se você quer que uma criatura aprenda a andar, você **não** recompensa "mover a perna direita" — você recompensa "avançou para frente", e deixa o agente descobrir que mover as pernas alternadamente é o que produz avanço. Recompensar o meio, e não o fim, é um erro clássico: o agente aprende a executar o meio sem alcançar o fim.
 
-> **Atenção — o problema da recompensa mal especificada**
+> ⚠️ **Atenção — o problema da recompensa mal especificada**
 > Como a recompensa é literalmente **tudo o que o agente busca**, uma recompensa mal projetada leva a comportamentos absurdos, porém tecnicamente "corretos". O exemplo célebre e documentado é o do jogo de barco *CoastRunners*: um agente treinado pela OpenAI, recompensado por **pontos** em vez de por **terminar a corrida**, descobriu que podia acumular mais pontos girando em círculos num lago para recolher itens repetidamente, ignorando a corrida por completo — e batendo, pegando fogo e indo na direção errada o tempo todo. O agente maximizou exatamente o que foi pedido; o pedido é que estava errado. Este fenômeno, chamado *reward hacking*, é uma das razões pelas quais RL é traiçoeiro na prática.
 
 ### Episódio
@@ -127,7 +127,7 @@ O dilema é que **os dois são necessários e conflitam entre si**. Um agente qu
 
 Uma estratégia simples e onipresente para esse equilíbrio é a **ε-greedy** (épsilon-guloso): na maior parte do tempo (probabilidade 1−ε) o agente faz *exploitation* — escolhe a melhor ação conhecida —, mas com uma pequena probabilidade ε ele explora — escolhe uma ação **aleatória**. Começa-se com ε alto (muita exploração) e o reduz gradualmente ao longo do treino.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > O dilema exploração/*exploitation* não é exclusivo de jogos ou de máquinas — é um problema profundo que aparece em economia, medicina e na vida cotidiana. É o famoso "problema do caça-níqueis de múltiplos braços" (*multi-armed bandit*): diante de várias máquinas caça-níqueis com prêmios desconhecidos, quantas vezes você tenta as menos conhecidas (explorar) antes de se fixar na que parece pagar mais (fazer *exploitation*)? A mesma matemática decide se um serviço de streaming deve recomendar sempre o que você já gosta ou arriscar sugestões novas.
 
 ### Retorno acumulado
@@ -138,7 +138,7 @@ Aqui aparece uma sutileza importante: recompensas **futuras** valem **menos** do
 
 Por que descontar? Por três razões: (1) o futuro é **incerto** — pode nem chegar; (2) matematicamente, o desconto garante que a soma seja **finita** mesmo em tarefas longas; (3) conceitualmente, modela a preferência natural por recompensas mais imediatas. Um γ próximo de 0 produz um agente "imediatista" (só olha a próxima recompensa); um γ próximo de 1 produz um agente "visionário" (planeja longos horizontes). A escolha de γ é uma decisão de projeto que discutiremos ao tratar da função valor.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O fator de desconto γ é um dos parâmetros mais importantes e mais mal-entendidos do RL. Valores comuns em jogos ficam entre 0,9 e 0,99. Um γ = 0,99 significa que o agente "enxerga" dezenas ou centenas de passos à frente — essencial em jogos onde a recompensa (a vitória) só vem no fim. Um γ baixo demais faz o agente ignorar consequências de longo prazo, comportando-se de forma míope; alto demais pode tornar o aprendizado lento e instável. É a mesma tensão "curto prazo × longo prazo" que já vimos no horizonte de busca do Minimax (Capítulo 11).
 
 [DIAGRAMA]
@@ -170,7 +170,7 @@ O aprendizado por reforço acontece em um laço de cinco etapas que se repetem i
 
 O agente então repete o ciclo a partir do novo estado *s′*, e assim por diante, até o episódio terminar. Um novo episódio começa, e o conhecimento **acumulado** dos episódios anteriores é preservado — é por isso que, ao longo de milhares de episódios, um comportamento inicialmente aleatório vai se refinando em uma estratégia competente.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A quantidade de repetições necessárias costuma chocar quem vem da programação baseada em regras. Enquanto uma FSM "funciona" na primeira execução, um agente de RL pode precisar de **milhões** de passos de interação para aprender uma tarefa modesta. É por isso que quase todo RL de jogos é treinado em **simulação acelerada** — muitas cópias do jogo rodando em paralelo, muito mais rápido que o tempo real, às vezes por horas ou dias. O agente "vive" o equivalente a anos de jogo antes de ficar bom.
 
 [DIAGRAMA]
@@ -207,10 +207,10 @@ Em outras palavras, o estado atual **resume tudo o que importa** para decidir o 
 
 Essa propriedade é o que torna o problema **tratável**: se o agente precisasse considerar toda a história de tudo o que já aconteceu, o número de "situações distintas" seria astronômico e o aprendizado impossível. A propriedade de Markov permite ao agente raciocinar apenas sobre o estado presente.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > A propriedade de Markov é uma **hipótese de projeto**, não um fato garantido — e ela impõe uma responsabilidade sobre quem define o estado. O estado precisa conter informação **suficiente** para que o futuro dependa só dele. Se, para decidir bem, o agente precisasse saber "de que direção o inimigo veio nos últimos 3 segundos" e essa informação **não** estiver no estado, então o problema **não é markoviano** em relação a esse estado, e o aprendizado será prejudicado. A solução prática é enriquecer o estado (por exemplo, incluir velocidades além de posições, ou um histórico curto). Projetar um bom estado é, em grande parte, **garantir que ele seja markoviano o suficiente**.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A cadeia de Markov — o parente sem decisões do MDP — foi criada pelo matemático russo **Andrei Markov** no início do século XX, originalmente para analisar padrões estatísticos em **poesia**: ele estudou a sequência de vogais e consoantes no romance *Eugênio Onéguin*, de Púchkin. Um século depois, a mesma ideia de "o próximo estado depende só do atual" sustenta desde a IA de jogos até os modelos de linguagem e o algoritmo original de ranqueamento do Google.
 
 ### Por que o MDP é a base do RL
@@ -243,7 +243,7 @@ A distinção entre **recompensa** e **valor** é sutil e absolutamente central:
 
 Um exemplo esclarece. Em um jogo, entrar em uma sala vazia pode dar recompensa **zero** (nada acontece ali), mas ter valor **alto** se aquela sala é o único caminho para o tesouro. Inversamente, pegar um item que dá +10 de recompensa **imediata** pode ter valor **baixo** se aquele item só aparece em um beco sem saída cercado de armadilhas mortais. Boas decisões seguem o **valor**, não a recompensa imediata — e é por isso que estimar o valor corretamente é o objetivo técnico do aprendizado.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Guiar o agente pela recompensa imediata em vez de pelo valor. Um agente míope, que só persegue a próxima recompensa, cai em todas as armadilhas de "isca": prêmios pequenos e imediatos que levam a desastres futuros. A função valor existe justamente para evitar isso — ela "propaga" o valor dos bons desfechos futuros de volta para os estados que conduzem a eles. É o mesmo princípio do mapa de influência (Capítulo 10), onde o valor de uma boa posição se espalhava pelo terreno ao redor.
 
 ### Valor de ação
@@ -262,7 +262,7 @@ E o **desconto temporal**, via fator γ, permeia tudo: no cálculo do valor, rec
 
 Juntando as peças: o agente **decide** olhando os valores de ação. Em cada estado, ele tende a escolher a ação de maior Q (*exploitation*), ocasionalmente experimentando outras (exploração). **Aprender**, portanto, é **estimar corretamente os valores Q** — e é exatamente isso que o Q-Learning faz. Uma vez que os valores estejam corretos, a política ótima **emerge automaticamente**: "em cada estado, faça a ação de maior valor". Toda a dificuldade do RL se concentra, então, em uma única tarefa: **descobrir os valores certos a partir da experiência**. É a essa tarefa que dedicamos a próxima seção.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A ideia de "função valor" — estimar quão boa é uma situação — não é exclusividade do RL; ela é, na verdade, uma das ideias mais reaproveitadas de toda a IA de jogos. A **função de avaliação** do Minimax (Capítulo 11) é uma função valor de estado escrita à mão. O **mapa de influência** (Capítulo 10) é uma função valor espacial. A diferença do RL é apenas **de onde vem o valor**: em vez de ser projetado por um humano, ele é **aprendido pela experiência**. Reconhecer essa continuidade ajuda a ver o RL não como algo alienígena, mas como a versão *aprendida* de uma ideia que a apostila usa desde a Parte IV.
 
 ---
@@ -283,7 +283,7 @@ No início, o agente **não sabe nada**: a tabela é inicializada com zeros (ou 
 
 Considere um exemplo minúsculo para tornar isso concreto. Um agente em um pequeno labirinto em grade, onde cada célula do mapa é um estado e as ações são {Norte, Sul, Leste, Oeste}. A tabela Q teria uma linha por célula do labirinto e quatro colunas. A célula (Estado = "posição ao lado da saída", Ação = "mover para a saída") acabaria com um valor alto; a célula (Estado = "posição ao lado de uma armadilha", Ação = "mover para a armadilha") acabaria com valor bastante negativo.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > A tabela Q só é viável quando o número de estados e ações é **pequeno o suficiente** para caber em memória e para ser visitado muitas vezes durante o treino. Um labirinto de 100 células com 4 ações precisa de uma tabela de 400 células — trivial. Mas um jogo cujo estado inclua posições contínuas, muitos inimigos e inventário pode ter **bilhões ou infinitos** estados — e aí a tabela se torna impossível. Essa é exatamente a limitação que o **Deep Reinforcement Learning** (Seção 12.7) vem resolver, substituindo a tabela por uma rede neural. Guarde isto: **a tabela Q é a versão didática e limitada; a rede neural é a versão escalável.**
 
 ### A atualização dos valores e a equação de Bellman
@@ -346,10 +346,10 @@ Nada fixa o algoritmo como acompanhá-lo em ação. Considere um agente em uma t
 
 Depois de muitos episódios, a tabela Q codifica a política ótima: **em cada estado, "Direita" tem valor maior que "Esquerda"**, então o agente, fazendo *exploitation*, caminha direto para a saída. Ele **descobriu o caminho** sem que ninguém jamais lhe dissesse "vá para a direita" — apenas pela recompensa em S5 e pela propagação de Bellman.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao estudar (ou depurar) Q-Learning, sempre pergunte: "o valor do objetivo já teve tempo de **escorrer para trás** até os estados iniciais?". No começo do treino, apenas as células **imediatamente** vizinhas da recompensa têm valor; a informação se propaga um passo por episódio (aproximadamente). Por isso tarefas com recompensa muito **distante** e **esparsa** (a vitória a centenas de passos, e nada no meio) aprendem devagar — o valor demora a percorrer toda a cadeia. Reconhecer isso explica muitos "fracassos" de RL que são, na verdade, só falta de tempo de propagação ou recompensas mal distribuídas.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > O Q-Learning tem uma propriedade teórica notável: é um método **off-policy** ("fora da política"). Isso significa que ele aprende os valores da política **ótima** mesmo enquanto o agente se comporta de forma **exploratória** (às vezes aleatória). Em outras palavras, o agente pode passar o treino inteiro fazendo bobagens exploratórias e, ainda assim, a tabela Q converge para os valores do comportamento **perfeito** — porque o `max` na regra de atualização sempre considera a melhor ação possível, não a que foi de fato tomada. É essa separação entre "como eu me comporto para aprender" e "o que eu aprendo" que dá ao Q-Learning boa parte de sua robustez, e prova-se matematicamente que, sob certas condições, ele **converge** para a política ótima.
 
 [DIAGRAMA]
@@ -377,7 +377,7 @@ A ideia do **Deep Reinforcement Learning** (RL Profundo) é **substituir a tabel
 
 O termo "*deep*" (profundo) vem de **redes neurais profundas** — redes com muitas camadas, capazes de extrair automaticamente características complexas dos dados de entrada (bordas, formas, objetos, numa imagem, por exemplo). Essa capacidade de **aprender a representação** do estado, além de aprender os valores, é o que dá ao RL profundo seu alcance.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Redes neurais são um tema extenso, com fundamentos próprios (neurônios artificiais, camadas, pesos, funções de ativação, retropropagação) que esta apostila **não** desenvolve em profundidade — pertencem a uma disciplina de Aprendizado de Máquina. Aqui, basta a ideia funcional: a rede é uma **caixa que aprende a mapear estados em valores de ação**, ocupando o lugar da tabela Q. Quem quiser se aprofundar deve estudar redes neurais e aprendizado profundo separadamente; para os fins deste capítulo, o conceito de "aproximador de função" é suficiente.
 
 ### Deep Q-Network (DQN)
@@ -395,7 +395,7 @@ O resultado foi histórico: um **único** algoritmo, sem ajustes específicos po
 
 **Limitações.** É **caro** e **faminto por dados**: exige quantidades imensas de interação (milhões a bilhões de passos) e muito poder computacional; é **instável** e sensível a hiperparâmetros (pequenas mudanças arruínam o treino); é uma **caixa-preta** de difícil interpretação e depuração (por que a rede decidiu aquilo? Ninguém sabe ao certo); e o comportamento resultante é difícil de **controlar** e de **garantir** — problemas sérios para um produto comercial que precisa ser previsível e depurável. Essas limitações explicam por que, apesar do brilho acadêmico, o RL profundo permanece **raro** na IA de jogos comerciais em produção.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > O uso mais realista de RL profundo em desenvolvimento de jogos raramente é "colocar um agente que aprende no produto final". É, muito mais frequentemente, uma **ferramenta de desenvolvimento**: treinar agentes para **testar** o jogo automaticamente (encontrar bugs, exploits, sequências que quebram o balanceamento), para gerar **dados** ou comportamentos de referência, ou para validar o *design* de um nível. Depois, o comportamento útil é frequentemente **destilado** em algo mais barato, previsível e controlável — muitas vezes de volta para regras ou uma política simplificada. RL como **martelo de design**, não como cérebro do NPC em tempo de execução.
 
 ---
@@ -428,7 +428,7 @@ Vejamos como a Aprendizagem por Reforço aparece — e onde **não** aparece —
 - **A estratégia.** Em tese, RL online que ajusta a política conforme o comportamento observado do jogador.
 - **Os resultados.** Na prática comercial, isso é **raro** via RL puro; o ajuste dinâmico de dificuldade costuma ser feito com heurísticas simples e sistemas baseados em regras (como o "Diretor de IA", que veremos na Parte VII), muito mais controláveis. É um caso onde a promessa teórica do RL raramente se concretiza no produto.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Ler a lista de feitos acima (AlphaGo, OpenAI Five) e concluir que "RL é como a IA dos jogos modernos funciona". É o oposto: esses são **projetos de pesquisa** que consumiram recursos computacionais colossais para demonstrar capacidades, **não** a IA que roda no seu jogo favorito. O NPC comercial típico continua sendo movido por FSM, behavior trees e GOAP. Confundir a fronteira da pesquisa com a prática de produção é o mal-entendido mais comum sobre RL em jogos.
 
 ---
@@ -447,7 +447,7 @@ A principal ferramenta de RL no ecossistema Unity é o **ML-Agents Toolkit** (Ma
 
 O ML-Agents implementa algoritmos modernos de RL (como o **PPO — Proximal Policy Optimization** — e o **SAC**), e não o Q-Learning tabular didático que estudamos; mas os **conceitos** que ele expõe (agente, observações, ações, recompensa, episódio, treinamento por interação) são precisamente os deste capítulo. É por isso que dominar os fundamentos **conceituais** é o que capacita alguém a usar a ferramenta com juízo — sem eles, o ML-Agents é uma caixa de botões sem sentido.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O ML-Agents é excelente como **laboratório de aprendizado** e como ferramenta de pesquisa/prototipagem dentro da Unity. Seus exemplos oficiais (criaturas que aprendem a andar, agentes que jogam minijogos, cooperação e competição entre agentes) são um dos melhores caminhos para *ver* RL funcionando. Mas repare: ele é uma ferramenta de **treinamento**, não um "componente de IA" que se arrasta para a cena e funciona pronto como o NavMesh. Treinar um agente exige definir bem estado, ações e recompensa, rodar longos treinamentos e lidar com toda a imprevisibilidade do RL.
 
 ### Unity Sentis (inferência de modelos)
@@ -458,7 +458,7 @@ Quando o treino termina, é preciso **executar** a rede neural treinada dentro d
 
 Fora do ecossistema Unity, o RL de pesquisa apoia-se em bibliotecas maduras: **Gymnasium** (antiga *OpenAI Gym*), o padrão para definir ambientes de RL; **Stable-Baselines3** e outras bibliotecas de algoritmos prontos; e os frameworks de aprendizado profundo **PyTorch** e **TensorFlow**, que fornecem as redes neurais subjacentes. No mundo das *engines*, a **Unreal** oferece o **Learning Agents**, uma proposta análoga ao ML-Agents para o seu ecossistema — uma comparação natural: ambos transformam cenas do motor em ambientes de treino de RL, refletindo o reconhecimento, pelos dois maiores motores, de que aprendizado é uma capacidade que vale a pena oferecer, ainda que de nicho.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Nenhuma dessas ferramentas dispensa a compreensão conceitual. Elas automatizam a **mecânica** do treinamento (a matemática das redes, a otimização, a coleta de experiência), mas as decisões que **determinam o sucesso** — o que colocar no estado, quais ações permitir, como moldar a recompensa — continuam sendo **de projeto**, e dependem inteiramente de entender os fundamentos das Seções 12.2 a 12.6. A ferramenta não pensa por você; ela executa bem o que você souber pedir.
 
 ---
@@ -487,7 +487,7 @@ Chega o momento da avaliação crítica — e, fiéis à orientação do capítu
 - **Adequado quando:** o comportamento certo é desconhecido ou complexo demais para regras; existe um simulador rápido para gerar bilhões de interações; imprevisibilidade e opacidade são toleráveis (pesquisa, ferramentas de teste, protótipos); e há orçamento computacional.
 - **Inadequado quando:** o comportamento pode ser razoavelmente programado à mão (a maioria dos NPCs); exige-se previsibilidade, controle fino e depurabilidade; não há simulador nem tempo/computação para treinar; ou o custo simplesmente não se justifica ante uma solução baseada em regras.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A regra prática que a indústria segue pode ser resumida assim: **use a ferramenta mais simples que resolve o problema.** Na esmagadora maioria dos casos de IA de jogos, essa ferramenta é uma FSM, uma behavior tree ou GOAP — não RL. O aprendizado por reforço entra apenas quando as abordagens determinísticas genuinamente falham ou seriam caras demais, ou como ferramenta de desenvolvimento. Essa não é uma limitação do RL "por ser novo"; é uma consequência sensata de seus custos e riscos reais versus os benefícios em cada contexto.
 
 ---
@@ -516,7 +516,7 @@ O repositório oficial do **ML-Agents** distribui ambientes de exemplo **documen
 
 Aqui entramos no terreno da **inferência cautelosa**. Ao contrário dos casos acima, o uso de RL **em produção** em jogos comerciais é **pouco documentado** e, quando existe, costuma ser pontual e experimental. É **razoável afirmar**, com base na literatura técnica e em relatos da indústria (como os das coletâneas *Game AI Pro*), que a IA da maioria dos jogos comerciais **não** usa RL, permanecendo baseada em técnicas determinísticas; e que, onde o aprendizado aparece, tende a ser como **ferramenta de desenvolvimento** (testes automatizados, balanceamento) mais do que como cérebro do NPC em tempo de execução. Deve-se, porém, **evitar** afirmar que "o jogo X usa RL" sem documentação oficial: na ausência de confirmação, trata-se de hipótese, não de fato.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Note o contraste com o Capítulo 11. Lá, tínhamos marcos comerciais claros e antigos (Deep Blue, Chinook). Aqui, quase todos os grandes marcos documentados de RL são **projetos de pesquisa** de laboratórios como DeepMind e OpenAI, não produtos comerciais. Essa assimetria é, ela própria, um dado importante sobre o estado da arte: o RL brilhou espetacularmente na **pesquisa**, mas sua adoção na **produção** de jogos permanece limitada — exatamente pelas razões de custo, controle e interpretabilidade discutidas na Seção 12.10.
 
 ---

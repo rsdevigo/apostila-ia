@@ -93,7 +93,7 @@ Os exercícios a seguir exigem **relacionar** os quatro capítulos entre si, nã
 - **HAREL, D.** *Statecharts: A Visual Formalism for Complex Systems* (1987) — para o aluno que quiser a origem formal da hierarquia e do estado de histórico usados no Capítulo 4.
 - Documentação oficial do pacote **Unity Behavior** e das **Behavior Trees da Unreal Engine** — para ver os conceitos do Capítulo 6 materializados em ferramentas profissionais.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao consultar as leituras, mantenha em mente o **quadro comparativo consolidado** deste Encerramento. Cada fonte tende a apresentar as arquiteturas de forma isolada; usar a tabela como mapa ajuda a enxergá-las como uma linhagem conectada, em vez de uma lista de técnicas independentes. Pergunte-se sempre: *que problema esta técnica resolve que a anterior não resolvia, e a que custo?*
 
 ## Referências Bibliográficas da Parte II

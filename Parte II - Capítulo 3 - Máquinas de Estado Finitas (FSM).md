@@ -8,7 +8,7 @@ A razão dessa onipresença é simples: a FSM captura, de forma quase óbvia, um
 
 Este capítulo abre a Parte II seguindo a filosofia da apostila: começa pelo **problema** que a FSM resolve, constrói seus **fundamentos** a partir da teoria dos autômatos, detalha seu **funcionamento** (incluindo as duas grandes variantes de implementação e o ciclo enter/update/exit), ilustra com **exemplos** clássicos de comportamento de NPC, pesa **vantagens e limitações** — com destaque para o problema que dará origem ao próximo capítulo, a *explosão de transições* — e, por fim, aterrissa a teoria nas **ferramentas da Unity e de terceiros** e no **mercado**. Ao final, a FSM não será apenas mais uma técnica: será a base conceitual sobre a qual todas as arquiteturas seguintes desta Parte serão construídas e comparadas.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > As máquinas de estado não nasceram nos jogos. Elas são um dos objetos matemáticos mais antigos e estudados da Ciência da Computação, formalizados na primeira metade do século XX no contexto da teoria da computação e dos autômatos — os mesmos autômatos finitos que descrevem circuitos digitais, analisadores léxicos de compiladores e protocolos de comunicação. Quando os primeiros desenvolvedores de jogos precisaram organizar o comportamento de inimigos em máquinas de recursos minúsculos (os arcades e consoles de 8 bits), a máquina de estados era a ferramenta perfeita: exigia pouquíssima memória, era rápida de executar e fácil de raciocinar. A IA de jogos, portanto, não *inventou* a FSM — ela **adotou** uma ferramenta madura e a colocou a serviço da ilusão de inteligência.
 
 ---
@@ -34,7 +34,7 @@ Segundo, **a lógica vira uma teia impossível de manter**. Cada novo comportame
 
 O problema real, portanto, não é "como escolher uma ação" — condicionais fazem isso. O problema é **como organizar comportamentos distintos e mutuamente exclusivos ao longo do tempo, de modo que o agente tenha uma noção clara de "em que modo está" e de "sob quais condições muda de modo"**. É exatamente esse problema que a máquina de estados resolve.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Pense em um inimigo de qualquer jogo de ação. Em quase todos os momentos, ele está fazendo *uma coisa por vez*: patrulhando, ou perseguindo, ou atacando, ou recuando — nunca "meio patrulhando e meio atacando". Essa característica — comportamentos **mutuamente exclusivos**, um ativo por vez — é a assinatura do problema que a FSM foi feita para resolver. Sempre que você conseguir descrever o comportamento de um agente como "ele está num destes N modos, e passa de um para outro quando acontece tal coisa", a FSM é uma candidata natural.
 
 ---
@@ -70,7 +70,7 @@ Nos jogos, reaproveitamos a **estrutura** do autômato, mas mudamos o **propósi
 
 A mais importante delas é o **caráter finito e determinístico**. "Finito" significa que o número de estados é fixo e conhecido de antemão — o agente nunca inventa um estado novo em tempo de execução. "Determinístico", na formulação clássica, significa que, dado o estado atual e o evento, o próximo estado é *univocamente* determinado. Essas duas propriedades são exatamente o que torna a FSM tão querida pela indústria: um comportamento finito e determinístico é **previsível, testável e depurável**. O designer pode enumerar todos os estados, revisar todas as transições e ter certeza de que não há comportamento "escondido". Como vimos na Parte I, previsibilidade e controle são critérios de primeira ordem na IA de jogos — e a FSM os oferece quase de graça, por sua própria natureza matemática.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A teoria dos autômatos distingue autômatos *determinísticos* (AFD) de *não determinísticos* (AFN), nos quais um mesmo evento poderia levar a vários estados. Um belo resultado clássico mostra que os dois têm o mesmo poder de reconhecimento — todo AFN pode ser convertido em um AFD equivalente. Na IA de jogos, quase sempre trabalhamos com máquinas *determinísticas*, justamente porque queremos comportamento previsível. Quando um jogo precisa de imprevisibilidade, ela costuma ser introduzida de forma controlada — por exemplo, uma transição que ocorre com certa probabilidade — e não pela ambiguidade do autômato.
 
 ### 3.2.2 Estados, guardas de transição e condições
@@ -81,7 +81,7 @@ Essa modelagem por guardas é importante por três motivos. Primeiro, ela **desa
 
 Esse último ponto merece atenção, pois é uma fonte comum de bugs. Suponha que o agente esteja no estado *Perseguir* e que, num dado quadro, *duas* guardas se tornem verdadeiras simultaneamente: "distância < 2 m" (que levaria a *Atacar*) e "vida < 10%" (que levaria a *Fugir*). Qual transição vence? A FSM precisa de uma **regra de desempate** — em geral, uma ordem de prioridade fixa entre as transições de saída de cada estado. O projetista deve decidir conscientemente essa ordem; deixá-la ao acaso produz comportamento errático e difícil de reproduzir.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Esquecer de definir a **prioridade** entre transições concorrentes. Quando duas guardas de saída de um mesmo estado podem ser verdadeiras ao mesmo tempo, a máquina precisa saber qual delas prevalece. Se a implementação simplesmente "pega a primeira que encontrar", o comportamento passa a depender da ordem em que as transições foram cadastradas — uma dependência frágil e invisível, que produz bugs difíceis de reproduzir. Boa prática: ordenar explicitamente as transições de cada estado por prioridade (por exemplo, sobrevivência antes de agressão).
 
 Vale também distinguir dois modelos teóricos de FSM que influenciam onde as ações "moram", conhecidos pelos nomes de seus criadores. Nas **máquinas de Moore**, a ação (a saída) depende apenas do *estado atual*: estar no estado *Atacar* produz sempre o comportamento de ataque, independentemente de como se chegou lá. Nas **máquinas de Mealy**, a saída depende do estado *e da transição* que levou a ele. Na IA de jogos, o modelo predominante é próximo do de Moore — o comportamento é definido pelo estado —, mas o ciclo enter/update/exit que veremos a seguir incorpora um toque de Mealy, ao permitir ações específicas *no momento da transição* (as ações de entrada e saída).
@@ -118,7 +118,7 @@ Na **FSM baseada em eventos**, o agente **não fica verificando condições**; e
 
 Na prática, jogos comerciais frequentemente **combinam as duas abordagens**: usam eventos para mudanças que outros sistemas já detectam naturalmente (dano recebido, colisão, jogador avistado pelo sistema de percepção) e polling para condições que só o próprio agente pode avaliar continuamente (distância a um alvo, tempo decorrido em um estado).
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Prefira **eventos** para condições que já são detectadas por outros sistemas (o motor de física já sabe quando houve uma colisão; o sistema de percepção já sabe quando avistou o jogador) e reserve o **polling** para o que precisa de verificação contínua e barata. Verificar por polling, a cada quadro, uma condição cara (como um *raycast* de linha de visão) para dezenas de agentes é uma das causas mais comuns de estouro do orçamento de IA. Quando o polling for inevitável, considere reduzir sua frequência (avaliar a cada poucos quadros em vez de todo quadro) para agentes distantes ou menos importantes — um uso do "LOD de IA" visto na Parte I.
 
 [DIAGRAMA]
@@ -140,10 +140,10 @@ Um refinamento essencial, presente em praticamente toda implementação profissi
 
 Essa tripartição resolve, de forma elegante, o problema de "memória de contexto" que atormentava a abordagem por condicionais. Considere novamente o guarda que investiga a última posição vista antes de voltar a patrulhar. Com o ciclo enter/update/exit, a solução é limpa: ao *entrar* no estado *Investigar*, o guarda registra a última posição conhecida e zera um cronômetro; na *permanência*, ele caminha até lá e olha em volta enquanto o cronômetro corre; a guarda de saída "cronômetro esgotado" o leva de volta a *Patrulhar*. Cada pedaço de estado vive no lugar certo.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O ciclo enter/update/exit não é apenas uma conveniência de programação — ele é o que torna a FSM *legível para o designer*. Ao abrir o estado *Atacar* de um inimigo, a equipe encontra, organizadamente: "ao entrar, grita e assume postura de combate"; "enquanto ataca, mira e dispara a cada X segundos"; "ao sair, guarda a última posição do alvo". Essa organização espelha como um roteirista descreveria a cena — e é justamente por isso que designers, não apenas programadores, conseguem trabalhar com FSMs.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Não confunda a ação de **permanência** (roda a cada quadro) com as de **entrada/saída** (rodam uma vez). Colocar no *update* algo que deveria estar no *enter* — por exemplo, "tocar o som de alerta" — faz o som se repetir a cada quadro, produzindo um erro audível e clássico de iniciante. A pergunta orientadora é sempre: *isto deve acontecer uma vez, ao mudar de modo, ou continuamente, enquanto estou neste modo?*
 
 ---
@@ -175,7 +175,7 @@ Legenda sugerida: Figura 3.1 — FSM completa de um inimigo guarda: cinco estado
 
 Um segundo exemplo, muito diferente em domínio mas idêntico em estrutura, mostra a generalidade da técnica: o **ciclo de vida de uma unidade coletora** em um jogo de estratégia (um aldeão de *Age of Empires*, por exemplo). Estados: *Ocioso*, *Indo coletar*, *Coletando*, *Voltando ao depósito*, *Depositando*. As transições formam um ciclo quase circular: de *Indo coletar* para *Coletando* (chegou ao recurso), de *Coletando* para *Voltando* (carga cheia), de *Voltando* para *Depositando* (chegou ao depósito), de *Depositando* de volta para *Indo coletar* (carga entregue). Um comportamento econômico complexo, essencial ao gênero, cabe numa FSM de cinco estados — evidência de que a técnica serve tanto ao combate quanto à simulação.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Muitos jogos de estratégia em tempo real modelam *cada unidade* como uma pequena FSM, e há centenas de unidades em tela. Isso ilustra por que o **baixo custo** da FSM é tão valioso: multiplicado por centenas de agentes, a diferença entre uma decisão barata e uma cara determina se o jogo roda ou engasga. Uma arquitetura de decisão elegante mas custosa seria inviável nesse cenário — a FSM, por ser quase gratuita, prospera.
 
 ---
@@ -207,7 +207,7 @@ Elementos obrigatórios: três FSMs de complexidade crescente (legível → dif�
 
 Esse não é um problema meramente estético. Ele ataca justamente as vantagens que tornam a FSM valiosa: a máquina deixa de ser **depurável** (ninguém consegue mais raciocinar sobre o novelo), deixa de ser **editável** pelo designer (a ferramenta visual vira um caos) e deixa de ser **modular** (tudo se conecta a tudo). É a percepção desse limite — vivido na prática pela indústria à medida que os jogos cresciam nos anos 1990 e 2000 — que motivou a busca por arquiteturas que **domassem a complexidade** sem abandonar as virtudes da FSM. A primeira dessas respostas, a **máquina de estados hierárquica**, é o tema do próximo capítulo.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Tentar resolver todo problema de comportamento adicionando *mais estados* à mesma FSM plana. Existe um ponto — em geral em torno de uma dúzia de estados — a partir do qual acrescentar estados *piora* a manutenibilidade em vez de melhorar o comportamento. Reconhecer esse ponto e migrar para uma arquitetura hierárquica (Capítulo 4) ou para árvores de comportamento (Capítulo 6) é sinal de maturidade de engenharia, não de fracasso da FSM.
 
 ---
@@ -224,7 +224,7 @@ A FSM está presente, de uma forma ou de outra, em praticamente todo jogo já fe
 
 **Sistemas de animação de personagens.** Um uso ubíquo e frequentemente esquecido: o **controle de animação** é quase sempre uma máquina de estados (*Parado → Andando → Correndo → Pulando → Caindo*). Na Unity, isso é *literalmente* o que o Animator Controller implementa, como veremos a seguir. Aqui não há inferência: a documentação oficial descreve o Animator como uma máquina de estados.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Um padrão recorrente na indústria é usar **duas FSMs em camadas** para um mesmo personagem: uma FSM de *decisão* (patrulhar/perseguir/atacar) e uma FSM de *animação* (parado/andando/atacando), sincronizadas. A FSM de decisão diz *o que* fazer; a de animação cuida de *mostrar* isso de forma fluida. Essa separação entre "cérebro" e "corpo" é uma boa prática que reaparecerá quando estudarmos árvores de comportamento acionando um sistema de animação por baixo.
 
 ---
@@ -241,7 +241,7 @@ Fiel à filosofia da apostila, o objetivo aqui **não** é ensinar menus, e sim 
 
 **FSM "na mão" em C#.** Fora das ferramentas visuais, é perfeitamente comum — e muitas vezes preferível — implementar a FSM diretamente em código C#, seja com um simples `enum` de estados e um `switch`, seja com o **padrão de projeto State** (cada estado como uma classe com métodos `Enter`, `Update` e `Exit`). Essa abordagem dá controle total e é a que melhor espelha os conceitos deste capítulo. Reforçamos, no entanto, o princípio da apostila: o objetivo é *compreender a estrutura*, não decorar uma implementação específica.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Usar o **Animator Controller para toda a lógica de IA** (e não apenas para animação) é uma prática difundida, mas controversa. A ferramenta foi otimizada para animação, e sobrecarregá-la com decisões complexas mistura duas responsabilidades ("cérebro" e "corpo") que a boa arquitetura recomenda separar. Para comportamento simples, funciona bem e economiza código; para comportamento complexo, tende a reproduzir — dentro do editor de animação — a mesma explosão de transições da seção 3.5.1. A decisão é de projeto: pese simplicidade imediata contra manutenibilidade futura.
 
 ---
@@ -252,7 +252,7 @@ O ecossistema em torno da Unity e das demais engines oferece diversas soluções
 
 Vale ainda mencionar, a título de comparação entre engines (sem sair do plano conceitual), que a **Unreal Engine** oferece o **State Tree**, uma abordagem que combina hierarquia de estados com seleção em árvore — uma evolução que dialoga tanto com este capítulo quanto com o Capítulo 4. O ponto a reter é que **toda engine profissional oferece meios visuais de construir máquinas de estado**, porque a FSM continua sendo um alicerce indispensável da IA de jogos.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao avaliar uma ferramenta de terceiros para FSM, os critérios que importam são os mesmos que a Parte I estabeleceu para a própria IA: ela oferece **visualização e depuração** claras do estado atual? Permite **autoria pelo designer** sem programar? Tem **bom desempenho** com muitos agentes? Integra-se bem ao restante do projeto? A sofisticação do editor é secundária diante dessas perguntas práticas.
 
 ---

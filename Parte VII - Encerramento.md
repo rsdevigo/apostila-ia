@@ -76,7 +76,7 @@ Elementos obrigatórios: os oito blocos na ordem indicada; a coluna lateral dos 
 
 A avaliação deve premiar o **rigor do método** e a **honestidade intelectual**, não o "acerto" da técnica. Sugestão de rubrica: **método e controle** da observação (repetição, isolamento de variáveis) — 25%; **qualidade das hipóteses** e sua fundamentação em evidências — 25%; **validação** (esforço genuíno de refutação e confronto com fontes) — 20%; **relação com os conceitos da apostila** (uso correto e integrado da teoria) — 15%; **clareza e honestidade da documentação** (separação fato/hipótese, rótulos de certeza, citação de fontes) — 15%. Um projeto que conclui "não foi possível determinar com confiança, mas as evidências favorecem levemente X, pelos motivos Y" pode valer **mais** do que um que afirma categoricamente uma técnica sem base — porque é exatamente essa a postura que o Capítulo 14 ensina.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > O melhor Projeto Integrador não é o que "descobre" a técnica secreta de um jogo — é o que **demonstra o método** com transparência exemplar. Se, ao final, você tem hipóteses bem fundamentadas, cada uma qualificada por seu nível de confiança e amarrada à evidência e à teoria, e se você tentou honestamente refutá-las, então você aprendeu o que esta apostila inteira quis ensinar: a enxergar a engenharia por trás da ilusão, com rigor e humildade.
 
 ## Leituras Complementares

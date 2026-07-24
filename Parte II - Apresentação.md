@@ -21,7 +21,7 @@ O fio condutor desta Parte é **evolutivo**. Cada arquitetura que estudaremos na
 
 Ao final, dois aprofundamentos mostram para onde a fronteira se moveu: o **planejamento GOAP**, que deixa o agente *montar seu próprio plano* em vez de segui-lo pré-escrito, e a **IA de utilidade (Utility AI)**, que troca regras rígidas por *pontuações contínuas* de desejo. Ambos aparecem como extensões modernas — enriquecem a compreensão sem competir, em importância, com o núcleo de Behavior Trees.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Leia esta Parte com uma pergunta sempre na mente: *que problema da arquitetura anterior esta nova arquitetura resolve — e a que custo?* Toda decisão de engenharia de IA é um balanço entre poder de expressão, custo computacional e facilidade de autoria. Se você mantiver esse balanço em foco, os quatro capítulos deixarão de parecer quatro técnicas soltas e passarão a formar uma única narrativa coerente.
 
 Ao concluir a Parte II, você será capaz de compreender como agentes de jogo tomam decisões, de reconhecer a assinatura de cada arquitetura ao observar um jogo, de justificar por que novas arquiteturas surgiram e — talvez o mais importante para um profissional — de **escolher a arquitetura certa para cada problema**, em vez de aplicar sempre a mais sofisticada ou a mais familiar.

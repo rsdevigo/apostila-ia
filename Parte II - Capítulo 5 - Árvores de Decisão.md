@@ -10,7 +10,7 @@ Essa é a **árvore de decisão**. Ela é, provavelmente, a estrutura de decisã
 
 Seguimos, de forma condensada, o roteiro da apostila: **problema**, **fundamentos** (com a distinção essencial frente à árvore de comportamento), **funcionamento**, **exemplo**, **vantagens e limitações** (por que os jogos migraram para árvores de comportamento), **jogos e aplicações**, **ferramentas** e o fechamento.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > As árvores de decisão têm dupla origem. Como estrutura de *lógica condicional*, são tão antigas quanto os fluxogramas e a própria programação. Como modelo de *aprendizado de máquina*, ganharam destaque a partir dos anos 1980 com algoritmos que **constroem** a árvore automaticamente a partir de dados (o mais célebre deles, o ID3, e seus sucessores). Na IA de jogos, quase sempre usamos a primeira acepção — árvores *escritas à mão* pelo designer —, mas vale conhecer a segunda, pois ela reaparece quando se fala em IA que aprende (Parte VI).
 
 ---
@@ -23,7 +23,7 @@ Considere um NPC que, a cada avaliação, precisa escolher uma entre várias aç
 
 A árvore de decisão oferece uma terceira via: **estruturar essa cadeia de condições como uma árvore**, em que cada nó interno faz *uma pergunta* e cada ramo corresponde a *uma resposta*, conduzindo a subperguntas cada vez mais específicas, até chegar a uma **folha** que representa a ação escolhida. A mesma lógica dos `if/else` aninhados, mas agora **visualizável, ordenável e editável** como um diagrama — recuperando, para a lógica condicional, a autoria visual que a FSM oferecia para os modos.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Um bom teste para saber se um problema pede uma árvore de decisão (e não uma FSM) é perguntar: *"o comportamento tem 'modos' que persistem no tempo, ou é uma escolha recalculada do zero a cada avaliação?"* Se o agente precisa "lembrar que estava perseguindo", pense em FSM. Se ele só precisa "olhar a situação atual e escolher a melhor ação agora", a árvore de decisão é mais direta. Na prática, as duas coexistem: é comum uma FSM usar, *dentro* de um estado, uma pequena árvore de decisão para escolher qual variação de ação executar.
 
 ---
@@ -64,7 +64,7 @@ As duas compartilham a **forma** (uma estrutura em árvore, com nós que se rami
 
 **Análise interpretativa.** A distância entre as duas é a mesma que separa "escolher uma ação" de "orquestrar um comportamento ao longo do tempo". A árvore de decisão é um **classificador**: entra a situação, sai *uma* ação, e acabou. A árvore de comportamento é um **executor**: seus nós internos não perguntam "qual é a situação?", mas comandam "faça isto; se der certo, faça aquilo; se falhar, tente esta alternativa", e acompanham cada tarefa ao longo de vários quadros por meio dos estados de retorno *sucesso/falha/em execução*. Em outras palavras: a árvore de decisão descreve **como decidir**; a árvore de comportamento descreve **como agir de forma estruturada**. Guardar essa diferença agora tornará o Capítulo 6 muito mais claro.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Tratar "árvore de decisão" e "árvore de comportamento" como sinônimos porque ambas são "árvores". São arquiteturas distintas, com propósitos distintos. A confusão é agravada pelo fato de que uma árvore de comportamento *pode conter* nós de condição que lembram os testes de uma árvore de decisão — mas o que caracteriza a árvore de comportamento são seus **nós compostos de controle de fluxo** (sequência, seletor, paralelo) e seus **estados de retorno**, ausentes na árvore de decisão clássica. Volte a este quadro comparativo quando estudar o Capítulo 6.
 
 ---
@@ -79,7 +79,7 @@ A eficiência de uma árvore de decisão depende fortemente de **quais testes fi
 
 A **profundidade** da árvore — o número de testes no caminho mais longo — determina o custo do pior caso e a legibilidade. Árvores rasas são rápidas e fáceis de ler, mas expressam decisões simples; árvores muito profundas expressam decisões refinadas, mas ficam difíceis de manter e podem repetir subárvores idênticas em ramos diferentes (uma redundância análoga à que vimos na FSM). Equilibrar profundidade e clareza é a arte de projetar boas árvores de decisão.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao ordenar os testes de uma árvore de decisão feita à mão, aplique dois critérios combinados: coloque no topo os testes que (1) são **mais determinantes** para a ação (separam o maior número de casos) e (2) são **mais baratos** de avaliar. Testes caros e pouco decisivos devem ficar o mais fundo possível, para serem evitados na maioria das avaliações. Esse princípio — testar cedo o que é barato e decisivo — reduz o custo médio da árvore sem alterar seu resultado.
 
 ### 5.3.2 Árvores de decisão aprendidas (breve nota sobre ID3/entropia)
@@ -88,7 +88,7 @@ Há uma vertente inteiramente diferente, oriunda do aprendizado de máquina, em 
 
 Registramos essa vertente apenas para contexto, por dois motivos. Primeiro, para que o aluno não confunda a **árvore de decisão escrita à mão** (o uso típico em jogos, tema deste capítulo) com a **árvore de decisão aprendida** (uma técnica de aprendizado supervisionado). Segundo, porque a ideia de "aprender uma árvore a partir de dados" reaparece na Parte VI, quando tratarmos de IA que aprende. Para os fins da Parte II — tomada de decisão baseada em **regras** —, o que importa é a árvore *autoral*, projetada pelo designer.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Não confunda os dois usos da mesma expressão. A "árvore de decisão" da IA de jogos deste capítulo é uma estrutura de **regras escritas por um humano**, previsível e controlável — coerente com os critérios da Parte I. A "árvore de decisão" do aprendizado de máquina é um **modelo estatístico induzido de dados**, e traz consigo as dificuldades de controle e depuração já discutidas para técnicas aprendidas. São a mesma estrutura de dados a serviço de filosofias opostas.
 
 ---
@@ -101,7 +101,7 @@ Um segundo exemplo, típico de jogos de esporte ou de estratégia, é a **decis�
 
 **Análise interpretativa.** Em ambos os exemplos, a árvore de decisão brilha exatamente onde a FSM seria desajeitada: não há comportamento contínuo a manter, apenas uma **escolha condicional recalculada**. E note como a árvore se combina naturalmente com as arquiteturas anteriores: nada impede que a folha "Atirar" da nossa árvore seja, na verdade, a *entrada* no estado *Atacar* de uma FSM. Na prática, árvores de decisão frequentemente vivem **dentro** de estados de uma FSM/HFSM, cuidando das microdecisões locais enquanto a máquina de estados cuida dos modos de longo prazo.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Árvores de decisão feitas à mão são muito usadas para decisões **rápidas e localizadas**: qual animação de reação tocar, qual linha de diálogo dizer, qual alvo priorizar, qual item usar. Raramente uma árvore de decisão sozinha governa *todo* o comportamento de um NPC complexo — para isso, a indústria preferiu as árvores de comportamento. A árvore de decisão é mais uma "ferramenta de bolso" para escolhas pontuais do que a espinha dorsal de uma IA inteira.
 
 ---
@@ -122,7 +122,7 @@ Quarto, ela **cresce mal em profundidade**: decisões refinadas exigem árvores 
 
 É a soma dessas limitações — ausência de tempo, de sequenciamento, de reutilização e de composição — que levou a indústria, a partir de meados dos anos 2000, a adotar as **árvores de comportamento**. Elas preservam a forma de árvore e a legibilidade, mas acrescentam justamente o que faltava: **nós de controle de fluxo** que sequenciam e selecionam comportamentos, **estados de retorno** que dão noção de duração e sucesso/falha, e **modularidade** que permite montar comportamentos complexos a partir de blocos reutilizáveis. O Capítulo 6 desenvolve tudo isso — e agora o leitor sabe *exatamente qual problema* essa arquitetura veio resolver.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Tentar expressar **sequências de ações com dependência** ("faça A; só se A der certo, faça B") como uma árvore de decisão. A árvore de decisão escolhe *uma* ação; ela não foi feita para orquestrar passos sucessivos que dependem do resultado uns dos outros. Forçar isso leva a árvores contorcidas e a variáveis de estado espalhadas pelo código. Esse é precisamente o território das árvores de comportamento (Capítulo 6).
 
 ---
@@ -139,7 +139,7 @@ Por ser um bloco de construção pequeno e ubíquo, a árvore de decisão rarame
 
 A atribuição de "árvore de decisão" a um título específico é, na maioria dos casos, **análise técnica fundamentada**, dada a natureza interna e pouco documentada desse componente.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A árvore de decisão é tão fundamental que aparece disfarçada em ferramentas que não a chamam por esse nome: sistemas de *diálogo ramificado* de RPGs, editores de *quests* condicionais e sistemas de regras de eventos são, estruturalmente, árvores de decisão. Sempre que você vir um fluxograma de "se o jogador fez X, então Y; senão Z", está diante de uma árvore de decisão, tenha ela esse rótulo ou não.
 
 ---
@@ -154,7 +154,7 @@ Entre terceiros, as ferramentas de IA já citadas — **NodeCanvas**, **Behavior
 
 O ponto a reter é que, na prática de jogos, a árvore de decisão *autoral* raramente exige uma ferramenta própria: ela vive dentro de código, de grafos de visual scripting ou, mais frequentemente, **embutida como nós de condição dentro de uma árvore de comportamento** — o que nos conduz diretamente ao próximo capítulo.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Se o seu comportamento é uma **decisão pontual** por poucas condições, uma árvore de decisão em código ou em visual scripting é suficiente e não justifica adotar uma ferramenta pesada. Reserve as ferramentas de árvore de comportamento para quando precisar **sequenciar, priorizar e reutilizar** comportamentos ao longo do tempo. Escolher a ferramenta proporcional ao problema é, também, um critério de boa engenharia.
 
 ---

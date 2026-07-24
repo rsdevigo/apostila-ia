@@ -10,7 +10,7 @@ A promessa da árvore de comportamento é conciliar quatro qualidades que as arq
 
 Este capítulo é o mais extenso da Parte, à altura de sua importância. Seguimos o roteiro da apostila com rigor: o **problema** que a BT resolve, seus **fundamentos** (nós compostos, decoradores, folhas e blackboard), seu **funcionamento** (ticks, fluxo e estados de retorno), **exemplos** completos de comportamento de guarda, as **vantagens e limitações**, os dois **aprofundamentos** modernos (GOAP e utilidade), um **quadro comparativo** consolidando toda a Parte, os **jogos conhecidos** (Halo, F.E.A.R., The Sims), as **ferramentas** (o pacote Unity Behavior e os terceiros) e o fechamento com **exercícios**.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > As árvores de comportamento emergiram na indústria de jogos em meados dos anos 2000, com um marco frequentemente citado: a IA de *Halo 2* (Bungie, 2004), cuja equipe desenvolveu e mais tarde documentou publicamente (em palestras e artigos técnicos) uma arquitetura baseada em árvores de comportamento para orquestrar o comportamento dos inimigos. A técnica se difundiu rapidamente porque respondia a uma dor concreta e generalizada: as HFSMs dos jogos, cada vez maiores, tornavam-se difíceis de manter e reutilizar. Em poucos anos, as árvores de comportamento passaram de novidade a padrão, incorporadas a engines e ferramentas comerciais. É um exemplo perfeito da lição da Parte I: uma técnica nasce quando um problema de produção a torna necessária e o ferramental a torna viável.
 
 ---
@@ -27,7 +27,7 @@ Reunindo tudo, o problema que a indústria precisava resolver era: **como descre
 
 A resposta da árvore de comportamento assenta sobre uma inversão conceitual elegante. Numa FSM, o conhecimento do fluxo mora nas **transições** entre estados: cada estado diz para onde ir. Numa BT, o conhecimento do fluxo mora na **estrutura da árvore**: são os *nós internos* que decidem, a cada momento, qual filho executar, e os comportamentos-folha não precisam saber *nada* sobre o que vem antes ou depois deles. Um comportamento "procurar cobertura" é apenas uma folha que faz seu trabalho e informa se teve sucesso ou não; *onde* ela é usada, e *o que* acontece em seguida, é decisão da árvore, não da folha. Esse **desacoplamento entre o comportamento e o controle do fluxo** é a chave de toda a modularidade e reutilização das BTs.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A melhor forma de sentir a diferença é pensar em como se *edita* cada arquitetura. Para mudar a prioridade de comportamentos numa FSM, você reescreve transições espalhadas. Numa árvore de comportamento, você **reordena filhos numa lista** — literalmente arrasta um nó para cima ou para baixo num editor visual. Para reutilizar um comportamento, na FSM você copia um estado e recria suas transições; na BT, você **encaixa a mesma subárvore** em outro lugar, e ela funciona, porque não conhece o contexto. Essa facilidade de edição e reúso é o que fez designers e programadores adotarem as BTs em massa.
 
 ---
@@ -53,7 +53,7 @@ Descrição detalhada: Três mini-árvores lado a lado, cada uma com um nó comp
 Elementos obrigatórios: três nós compostos com seus símbolos; folhas de exemplo; anotações da semântica de cada um; legenda dos estados de retorno.
 [/DIAGRAMA]
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Um padrão idiomático das árvores de comportamento é o **seletor de prioridades no topo**: a raiz costuma ser um seletor cujos filhos são subárvores de comportamento em ordem decrescente de prioridade — sobrevivência primeiro, depois combate, depois investigação, depois patrulha. A cada tick, o agente naturalmente executa o comportamento mais prioritário que *consegue* executar naquele momento. Essa organização torna a prioridade **explícita e visual**: ela é, simplesmente, a ordem dos filhos do seletor-raiz. Comparada à replicação de transições de sobrevivência que a HFSM exigia, é uma simplificação notável.
 
 ### 6.2.2 Decoradores e nós de folha (ação/condição)
@@ -72,7 +72,7 @@ As **condições** (*condition nodes*) testam algo sobre o estado do mundo ou do
 - **Guarda/Condição de decorador (*Conditional decorator*)** — só permite executar o filho se uma condição for satisfeita, funcionando como uma "porteira".
 - **Cooldown / Temporizador** — impede que o filho seja reexecutado antes de decorrido certo tempo, ou limita sua duração. Essencial para ritmar comportamentos ("não lançar granada mais de uma vez a cada 10 s").
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A palavra "decorador" vem do padrão de projeto *Decorator* da engenharia de software, no qual um objeto "embrulha" outro para acrescentar comportamento sem alterá-lo. A escolha do termo não é acidental: as árvores de comportamento foram, desde cedo, pensadas com o vocabulário de *design patterns* de software, e é por isso que dialogam tão bem com boas práticas de programação — modularidade, composição, responsabilidade única. Uma folha faz *uma* coisa; um decorador acrescenta *um* aspecto; um composto orquestra o fluxo. Cada nó tem uma responsabilidade clara.
 
 ### 6.2.3 Blackboard e compartilhamento de dados
@@ -90,7 +90,7 @@ Descrição detalhada: À esquerda, uma árvore de comportamento simples (um sel
 Elementos obrigatórios: árvore de comportamento à esquerda; blackboard com pares chave→valor à direita; setas de leitura e escrita entre nós e chaves; nota sobre desacoplamento.
 [/DIAGRAMA]
 
-> **Atenção**
+> ⚠️ **Atenção**
 > O blackboard é poderoso, mas pode virar uma "lata de lixo global" se usado sem disciplina. Despejar todo tipo de dado nele, com nomes inconsistentes e sem clareza sobre quem escreve e quem lê cada chave, recria — em forma de dados — o acoplamento que a árvore de comportamento veio eliminar. Boa prática: documentar as chaves do blackboard, manter nomes consistentes e restringir o que cada subárvore lê e escreve. O desacoplamento das BTs só se sustenta se o blackboard for tratado com o mesmo cuidado que uma interface de módulo.
 
 ---
@@ -131,10 +131,10 @@ tick do SELETOR (filhos em ordem de prioridade):
 
 Um ponto de projeto importante é o comportamento de **reavaliação**. Numa implementação básica, cada tick recomeça da raiz e desce, o que faz a árvore reavaliar naturalmente as prioridades: se, enquanto o agente patrulhava, o jogador aparece, o seletor-raiz — reavaliado do topo — passa a escolher a subárvore de combate, mais prioritária, interrompendo a patrulha. Esse "interromper o menos prioritário quando surge algo mais importante" é frequentemente refinado com **decoradores de interrupção** (às vezes chamados de *reactive* ou *conditional aborts*), que permitem abortar um ramo em execução quando uma condição de maior prioridade se torna verdadeira. É esse mecanismo que dá às BTs sua **reatividade**: elas não apenas executam planos, mas reagem a mudanças, largando o que faziam quando algo mais urgente acontece.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Supor que, uma vez iniciada, uma sequência sempre roda até o fim. Numa árvore *reativa* (com reavaliação a partir da raiz e/ou decoradores de interrupção), um ramo em execução pode ser **abortado** se um comportamento de maior prioridade se tornar viável. Ignorar isso leva a dois erros opostos: esperar que o agente termine uma sequência longa quando ele deveria reagir a uma ameaça, ou, ao contrário, deixar comportamentos serem interrompidos no meio de forma indesejada (o agente "gagueja", recomeçando ações). Projetar *onde* permitir interrupções — e onde proteger uma sequência de ser abortada — é parte central do bom uso das BTs.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O custo de execução de uma BT é geralmente baixo, mas não nulo: tickar a árvore inteira, a partir da raiz, a cada quadro, para muitos agentes, pode pesar. As mesmas estratégias da Parte I se aplicam: reduzir a frequência de tick para agentes distantes (LOD de IA), evitar reavaliar subárvores caras a cada quadro, e usar *event-driven behavior trees*, uma variante em que a árvore só é reavaliada quando um evento relevante muda o blackboard, em vez de a cada quadro — o análogo, nas BTs, da FSM por eventos do Capítulo 3.
 
 ---
@@ -164,7 +164,7 @@ Legenda sugerida: Figura 6.1 — O mesmo inimigo dos Capítulos 3 e 4, agora com
 
 **Análise interpretativa comparativa.** Contraste as três versões do guarda. Na **FSM** (Cap. 3), a lógica vivia nas *transições* entre cinco estados, e a regra de sobrevivência se espalhava por vários deles. Na **HFSM** (Cap. 4), a hierarquia agrupou estados e permitiu herdar a regra de sobrevivência uma vez — um avanço de organização. Na **BT**, a regra de sobrevivência é simplesmente **o primeiro filho do seletor-raiz**: sua prioridade é a sua *posição*. Mudar prioridades é reordenar filhos; adicionar um comportamento é inserir uma subárvore; reutilizar "avançar para cobertura" em outro agente é copiar aquela folha, que nada sabe do contexto. O comportamento observável é praticamente o mesmo nas três; o que muda — e muda decisivamente — é a **facilidade de construir, editar, reutilizar e depurar**. É por isso, e não por produzir agentes "mais inteligentes", que a indústria adotou as árvores de comportamento.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Um padrão profissional recorrente é usar a árvore de comportamento como o "cérebro" (a decisão) e uma **máquina de estados de animação** como o "corpo" (a apresentação). A folha "atirar" da BT não anima nada diretamente: ela escreve no blackboard "estado = atirando", e o Animator (uma FSM, como vimos no Cap. 3) cuida de tocar a animação certa e transicioná-la suavemente. Essa divisão "BT decide, FSM anima" combina o melhor das duas arquiteturas e é a arquitetura de fato de muitos jogos comerciais — um exemplo concreto da lição de que as técnicas se acumulam em camadas, não se substituem.
 
 ---
@@ -181,7 +181,7 @@ As BTs não são uma panaceia, e reconhecer seus limites é o que abrirá caminh
 
 É importante situar essas limitações na medida certa. Elas **não** destronam a árvore de comportamento — que continua sendo a espinha dorsal da IA de decisão na indústria — mas indicam as fronteiras onde outras técnicas de decisão a complementam. As duas seções seguintes, de **aprofundamento**, apresentam essas fronteiras: o planejamento (GOAP) e a pontuação de utilidade (Utility AI). O leitor deve encará-las como *extensões modernas* que ampliam o repertório, e não como substitutas do núcleo que acabou de estudar.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Não trate a árvore de comportamento como martelo universal. Para comportamento *modal* estável (poucos modos bem definidos), uma FSM/HFSM pode ser mais simples. Para decisões *pontuais* por condições, uma árvore de decisão embutida basta. Para comportamento *rico, sequenciado e reutilizável*, a BT é imbatível. E, para os casos das seções seguintes — planejar sequências dinamicamente (GOAP) ou ponderar muitas opções contínuas (utilidade) —, considere combinar a BT com essas técnicas. A maturidade de engenharia está em **escolher e combinar**, não em aplicar sempre a arquitetura da moda.
 
 ---
@@ -212,7 +212,7 @@ Elementos obrigatórios: caixa de objetivo; blocos de ação com pré-condiçõe
 
 **Vantagens e limitações.** O GOAP produz comportamento que *parece* engenhoso e adaptativo — o agente "improvisa" planos diante de situações variadas, o que reforça fortemente a ilusão de inteligência — e reduz o trabalho de antecipar todas as sequências à mão. Em contrapartida, é **mais caro** (a busca por um plano custa mais que descer uma árvore), **mais difícil de depurar e de controlar** (o comportamento *emerge* da busca, e prever o que o agente fará em cada situação é menos direto — atrito com o critério de autoria da Parte I), e exige modelar cuidadosamente pré-condições, efeitos e custos, o que é trabalhoso e sujeito a erros sutis. Por isso, o GOAP, embora influente e admirado, teve adoção **mais seletiva** que as BTs na indústria.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > O GOAP ganhou fama com *F.E.A.R.* (Monolith, 2005), cujo comportamento de esquadrão inimigo — flanquear, usar cobertura, coordenar avanços — impressionou por parecer notavelmente inteligente. A equipe documentou publicamente (em artigos e palestras técnicas) o uso de um planejador GOAP combinado com uma máquina de estados enxuta. Um ponto frequentemente ressaltado por quem analisa o caso é que boa parte da "inteligência" percebida vinha também da **comunicação** — os inimigos anunciavam em voz alta o que faziam ("Ele está atrás do sofá!", "Cobrindo!") —, um lembrete direto da lição da Parte I: a ilusão de inteligência é tanto sobre *comunicar* o comportamento quanto sobre *computá-lo*. Estudaremos *F.E.A.R.* em profundidade no Capítulo 15.
 
 ---
@@ -241,10 +241,10 @@ Elementos obrigatórios: ações candidatas; considerações de entrada normaliz
 
 **Vantagens e limitações.** A IA de utilidade brilha em **decisões com muitos fatores contínuos e concorrentes**, produzindo comportamento que parece **ponderado e "orgânico"**, sem a rigidez das prioridades fixas; é fácil introduzir **variação** (via seleção probabilística) e ajustar o "temperamento" do agente mexendo nas curvas. Em contrapartida, é **mais difícil de depurar e de prever**: quando um agente faz algo estranho, descobrir *qual curva ou peso* causou aquilo pode ser trabalhoso, pois a decisão emerge de um balanço numérico e não de uma regra explícita (novamente, um atrito com o critério de controle do designer). Ajustar (*tunar*) as curvas e pesos exige iteração cuidadosa. Por isso, a utilidade é frequentemente usada **em combinação** com outras arquiteturas — por exemplo, uma folha de BT que, quando alcançada, usa utilidade para escolher *entre variações* de uma ação, ou uma FSM cujo estado é escolhido por pontuação de utilidade.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > O exemplo canônico de IA de utilidade é *The Sims* (Maxis/EA, 2000), cujo sistema de decisão é documentado, em linhas gerais, em torno de **necessidades** dos personagens e de **objetos inteligentes** (*smart objects*) que "anunciam" a utilidade das ações que oferecem: uma geladeira anuncia "eu satisfaço fome"; uma cama, "eu satisfaço energia". O Sim escolhe a ação de maior utilidade ponderada por suas necessidades atuais. É um caso elegante em que a *própria mecânica de jogo* — cuidar de personagens com necessidades — é a IA de utilidade tornada visível ao jogador. Voltaremos a *The Sims* no Capítulo 15.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A noção de "utilidade" que a técnica empresta vem da **teoria da decisão** e da economia, onde "utilidade" é uma medida numérica de preferência. A IA de utilidade de jogos é, num sentido bem real, uma aplicação pragmática da ideia de *agente racional* que maximiza utilidade esperada — a mesma que Russell e Norvig apresentam na IA acadêmica (Parte I). A diferença é que, em jogos, as curvas de utilidade são *projetadas para divertir*, não para modelar racionalidade verdadeira: mais uma faceta da ilusão de inteligência.
 
 ---
@@ -276,7 +276,7 @@ Reunimos os três estudos de caso emblemáticos das arquiteturas deste capítulo
 
 **The Sims (2000) — IA de utilidade.** É o caso canônico de IA de utilidade, com mecânica **documentada** em linhas gerais em torno de necessidades e de objetos inteligentes que anunciam a utilidade das ações. A decisão dos personagens por maximização de utilidade ponderada pelas necessidades é, ao mesmo tempo, a IA do jogo e a sua mecânica central.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Mesmo em casos "documentados", os detalhes públicos costumam ser de *alto nível* (palestras e artigos descrevem a arquitetura em linhas gerais, não o código). Ao afirmar que "*Halo* usa árvores de comportamento", apoiamo-nos em declarações da própria equipe; ao descrever *como exatamente* cada nó foi implementado, entramos no terreno da análise. A apostila mantém essa distinção porque ela é uma competência profissional: saber *o que se sabe* e *como se sabe* é parte da engenharia reversa de IA que estudaremos na Parte VII.
 
 ---
@@ -291,7 +291,7 @@ Coerentes com a filosofia da apostila, apresentamos *onde* as árvores de compor
 
 **Comparação entre engines.** Fora da Unity, a **Unreal Engine** oferece um sistema de **Behavior Trees** nativo e amplamente usado, acompanhado de um *blackboard* e integrado ao seu sistema de percepção — uma das implementações comerciais mais conhecidas da técnica —, além do já citado **State Tree**, que mescla estados hierárquicos e seleção em árvore. O ponto a reter é que **toda engine profissional moderna oferece árvores de comportamento de primeira classe**, o que confirma o status da técnica como padrão da indústria para IA de decisão.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao adotar uma ferramenta de BT, avalie, além do editor, três aspectos que a teoria deste capítulo mostrou serem decisivos: (1) a qualidade da **depuração visual** — consigo ver, em tempo de execução, qual nó está *em execução*, com *sucesso* ou *falha*? (2) o suporte a **reatividade/interrupções** — a ferramenta permite abortar ramos quando algo mais prioritário surge? (3) a disciplina de **blackboard** — os dados compartilhados são bem organizados e tipados? Um editor bonito com depuração fraca custa caro na prática, porque a maior parte do trabalho com BTs é *entender por que o agente fez o que fez*.
 
 ---

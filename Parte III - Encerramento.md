@@ -122,7 +122,7 @@ Os exercícios a seguir exigem **relacionar** os três capítulos entre si — e
 - **HARABOR, D.; GRASTIEN, A.** *Online Graph Pruning for Pathfinding on Grid Maps* (2011) — o artigo original do Jump Point Search, para quem quiser a fonte primária do Capítulo 9.
 - Documentação oficial do sistema **AI Navigation / NavMesh** da Unity e da navegação da **Unreal Engine** — para ver os conceitos materializados nas ferramentas profissionais, e a biblioteca aberta **Recast & Detour** para entender o que há "por baixo do botão de bake".
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao consultar as leituras, mantenha as **duas tabelas comparativas** deste Encerramento como mapa. As fontes tendem a apresentar cada representação e cada algoritmo isoladamente; usar as tabelas ajuda a enxergá-los como um **espaço de trade-offs** conectado, e não como uma lista de técnicas soltas. Pergunte-se sempre, diante de cada técnica: *que problema ela resolve, que pressupostos ela exige, e a que custo?*
 
 ## Referências Bibliográficas da Parte III

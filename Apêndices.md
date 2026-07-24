@@ -251,7 +251,7 @@ Para uma leitura orientada, o glossário pode ser cruzado com a **tabela-decisã
 
 Este apêndice consolida, em formato de consulta, **como cada conceito da apostila se materializa em ferramentas**. O objetivo é o mesmo dos capítulos: **contextualizar**, não ensinar menus. Para o aprofundamento de cada técnica, consulte o capítulo indicado. As ferramentas de terceiros e as equivalências na Unreal Engine aparecem apenas como referência comparativa.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > A apostila não é um manual de Unity. As ferramentas evoluem e mudam de nome entre versões (por exemplo, o pacote **Unity Behavior**, de 2024, passou a ser a via oficial de grafos de comportamento; o antigo **Bolt**, de terceiros, foi absorvido pela Unity e virou o **Visual Scripting**). Trate a coluna "ferramenta oficial" como o ponto de partida atual, sempre confirmando na documentação da versão em uso.
 
 ## B.1 Relação conceito → ferramenta
@@ -274,7 +274,7 @@ A tabela relaciona cada conceito estudado à ferramenta **oficial** da Unity (qu
 | Algoritmos genéticos / heurísticas | (conceitual; implementado em C#) | Bibliotecas de GA em C#; frameworks de neuroevolução | 13 |
 | Engenharia reversa / estudos de caso | (todas as anteriores, aplicadas em análise) | — | 14, 15 |
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A maior parte da IA "de gameplay" em jogos comerciais Unity é montada com **três blocos**: NavMesh Agent para movimento, um sistema de decisão (Animator/Unity Behavior ou um asset de Behavior Tree) para escolher ações, e código C# próprio para percepção e regras específicas. O ML-Agents é a exceção avançada, mais comum em pesquisa, QA automatizado e protótipos do que em produção.
 
 ## B.2 Recursos online comentados
@@ -336,7 +336,7 @@ Ferramenta de revisão geral. Cada linha parte de um **problema típico** e suge
 | Gerar conteúdo ou comportamento variado automaticamente | Algoritmo genético / PCG | Aprendizagem por reforço | 13 |
 | Descobrir qual técnica um jogo comercial provavelmente usa | Metodologia de engenharia reversa | — | 14, 15 |
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Leia esta tabela de cima para baixo: as primeiras linhas trazem técnicas mais simples e baratas. Só desça para RL e algoritmos genéticos quando as técnicas determinísticas realmente não derem conta — na indústria, a solução mais simples que convence é quase sempre a vencedora.
 
 ## C.2 Tabela consolidada de arquiteturas e algoritmos
@@ -384,7 +384,7 @@ Síntese cronológica dos marcos discutidos, sobretudo no Capítulo 2 e retomado
 | 2017 | Lançamento do **Unity ML-Agents** | RL acessível dentro de uma engine comercial | 12 |
 | 2018–2019 | **AlphaZero**; **AlphaStar** (StarCraft II) | Autoaprendizado geral; RL em jogo comercial complexo | 11, 12 |
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A distância entre a teoria e o uso comercial é enorme na linha do tempo: o A\* é de 1968, mas só se tornou onipresente nos jogos décadas depois, quando o hardware permitiu recalculá-lo dezenas de vezes por segundo para muitos agentes. A história da IA de jogos é, em boa medida, a história do hardware que passou a caber no orçamento de quadro.
 
 ## C.4 Checklist para o professor
@@ -532,7 +532,7 @@ Sugestões de aprofundamento, organizadas por tema e priorizando os materiais us
 - **Red Blob Games** (`redblobgames.com`) — tutoriais interativos clássicos sobre A\*, heurísticas e grids.
 - **Canais técnicos de referência** — séries de vídeo bem estabelecidas sobre pathfinding A\* e IA de jogos (por exemplo, os tutoriais de A\* de Sebastian Lague), úteis como apoio visual às demonstrações do professor.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Materiais externos (vídeos, blogs, wikis) são excelentes para intuição e prática, mas variam em rigor. Para definições e afirmações técnicas, prefira sempre as fontes-base do projeto e a documentação oficial.
 
 ## D.3 Índices da obra

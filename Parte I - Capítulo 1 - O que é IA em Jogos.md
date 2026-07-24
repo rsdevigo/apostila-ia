@@ -8,7 +8,7 @@ O termo, porém, esconde uma armadilha. Ao ouvir "inteligência artificial", o e
 
 Este capítulo constrói, passo a passo, o enquadramento correto para estudar IA de jogos. Começamos pelo **problema** que a IA resolve no design de jogos, passamos pela ideia central da **ilusão de inteligência**, formalizamos o **agente** e seu ciclo de funcionamento, estabelecemos os **critérios de qualidade** específicos de jogos e, por fim, apresentamos o **mapa das técnicas** que a apostila percorrerá e as **convenções** que padronizam o texto.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > A expressão "inteligência artificial" nasceu em 1956, na célebre conferência de Dartmouth, num contexto puramente acadêmico: o objetivo era construir máquinas capazes de raciocinar como seres humanos. A IA de jogos, embora use muitas ferramentas herdadas dessa tradição, desenvolveu-se em grande parte de forma independente, dentro da indústria do entretenimento, com objetivos e restrições próprios. Entender essa "genealogia dupla" ajuda a compreender por que os dois campos usam palavras iguais para significar coisas diferentes.
 
 ---
@@ -25,7 +25,7 @@ Esse é o problema fundamental da IA de jogos. Ele tem três faces:
 - **Face da credibilidade.** A entidade precisa parecer que "entende" a situação. Se um inimigo continua atirando numa parede depois que o jogador se escondeu, a ilusão se quebra.
 - **Face da experiência.** A entidade não existe para vencer o jogador, mas para *proporcionar uma experiência*. Sua "inteligência" está a serviço do design, não da vitória.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Imagine um jogo de furtividade. Se cada guarda seguisse sempre exatamente a mesma rota, na mesma velocidade, reagindo sempre da mesma forma, o jogo viraria um quebra-cabeça de memorização — divertido por alguns minutos, tedioso depois. Se, por outro lado, cada guarda reagisse a sons, luzes e corpos caídos de maneira plausível, o jogador sentiria estar enganando um oponente *pensante*. A IA aqui não é um detalhe técnico: ela **é** o jogo.
 
 ### 1.1.1 Do adversário à experiência: o papel da IA no game design
@@ -43,7 +43,7 @@ Com a maturação do meio, o papel da IA se expandiu enormemente. Hoje, a IA de 
 
 O ponto essencial é que, em todos esses papéis, a IA está a serviço da **experiência projetada**. O game designer define qual experiência o jogo deve proporcionar; a IA é um dos instrumentos para realizá-la. Um inimigo não é "bom" porque é difícil de vencer, mas porque produz a experiência que o designer pretendia — tensão, alívio, sensação de esperteza do jogador, humor, medo.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Um erro conceitual comum é avaliar a IA de um jogo pela métrica errada: "essa IA é boa porque é difícil de vencer" ou "essa IA é ruim porque eu consegui enganá-la". A pergunta correta é sempre: *essa IA produziu a experiência pretendida pelo design?* Às vezes, deixar-se enganar é exatamente o que a IA deveria fazer.
 
 [IMAGEM NECESSÁRIA]
@@ -79,7 +79,7 @@ A tabela a seguir sintetiza as diferenças centrais.
 
 **Análise interpretativa.** A tabela revela que IA de jogos e IA acadêmica não são "a mesma coisa aplicada a contextos diferentes", mas sim **duas disciplinas com valores distintos que compartilham um instrumental comum**. A consequência prática é profunda: uma técnica considerada "primitiva" pela pesquisa acadêmica — como uma simples máquina de estados — pode ser a *melhor* escolha para um jogo, justamente porque é previsível, barata, depurável e controlável. Inversamente, uma técnica sofisticada de aprendizado de máquina pode ser inadequada para um jogo comercial, não por ser "ruim", mas por ser imprevisível, cara de ajustar e difícil de controlar. Ao longo da apostila, veremos repetidamente que **a técnica certa é a que melhor atende aos critérios de jogo**, e não a mais avançada em termos acadêmicos.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Achar que "IA de jogos moderna = aprendizado de máquina / redes neurais". A imensa maioria dos jogos comerciais, inclusive títulos recentes de grande orçamento, usa técnicas determinísticas e clássicas (máquinas de estado, árvores de comportamento, busca de caminhos) porque elas oferecem controle, previsibilidade e baixo custo. O aprendizado de máquina tem papel crescente, mas ainda restrito, e será estudado com esse contexto na Parte VI.
 
 ---
@@ -105,7 +105,7 @@ Há uma distinção filosófica clássica que ajuda aqui: a diferença entre **I
 
 **Análise interpretativa.** A IA de jogos é, por natureza, um exercício de **IA fraca**: ninguém pretende que o fantasma *sinta* vontade de capturar o jogador. O objetivo é que o comportamento resultante seja *lido* pelo jogador como intencional. Essa é a essência da ilusão de inteligência: o personagem não precisa pensar — precisa apenas **parecer que pensa**. E, como veremos, "parecer" pode ser alcançado com mecanismos muito mais simples e baratos do que "ser".
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Os seres humanos têm uma tendência natural, estudada pela psicologia, de atribuir intenções e estados mentais a qualquer coisa que se mova de forma aparentemente dirigida a um objetivo — fenômeno próximo do que se chama de *antropomorfização* e *agência percebida*. Um experimento clássico de 1944 (Heider e Simmel) mostrou que pessoas descreviam triângulos e círculos em movimento como se tivessem emoções e intenções ("o triângulo grande está perseguindo o pequeno"). A IA de jogos explora exatamente essa predisposição: o jogador *quer* ver intenção, e basta um comportamento minimamente coerente para que ele a enxergue.
 
 [DIAGRAMA]
@@ -125,7 +125,7 @@ A ilusão de inteligência se sustenta sobre um equilíbrio delicado entre três
 
 **Diversão** é o critério soberano, do qual os outros dois são instrumentos. Uma IA crível e com padrões legíveis existe para gerar diversão — tensão, satisfação, humor, sensação de domínio. Quando credibilidade ou previsibilidade entram em conflito com a diversão, é a diversão que prevalece. Um exemplo célebre: em muitos jogos de tiro, os inimigos deliberadamente **erram os primeiros disparos** contra o jogador. Do ponto de vista da "inteligência real", isso é irracional. Do ponto de vista da experiência, é essencial: dá ao jogador tempo de reagir, comunica a ameaça e evita a frustração de morrer sem chance.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A prática de fazer os inimigos errarem os primeiros tiros propositalmente é tão difundida que recebeu nomes informais na indústria, como "primeiro tiro de aviso" ou "tiro de cortesia". É um exemplo perfeito de como a IA de jogos subordina a "inteligência" à experiência: um atirador realmente competente acertaria de primeira, mas isso arruinaria o jogo.
 
 ### 1.2.3 O "ponto ideal" de dificuldade e a IA que perde de propósito
@@ -148,10 +148,10 @@ Manter o jogador no ponto ideal é, muitas vezes, tarefa da IA. Isso leva a uma 
 - **Dificuldade dinâmica** (*Dynamic Difficulty Adjustment*, DDA), em que o jogo mede o desempenho do jogador e ajusta a IA em tempo real — abordagem tornada célebre pelo "Diretor de IA" de *Left 4 Dead*, que estudaremos na Parte VII.
 - **Erros propositais e "burrice programada"** para dar chances ao jogador.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > Em *Left 4 Dead* (Valve, 2008), um sistema chamado *AI Director* monitora continuamente o "estado emocional" estimado dos jogadores (com base em dano sofrido, progresso, munição) e ajusta o ritmo — soltando mais ou menos inimigos, distribuindo itens — para criar uma curva de tensão e alívio. A IA ali não busca vencer os jogadores, mas *dirigir a experiência* como um diretor de cinema dirige o suspense. Voltaremos a esse caso no Capítulo 15.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > "IA que perde de propósito" não significa "IA mal feita". Fazer uma IA parecer competente enquanto perde de forma crível é *mais* difícil do que fazê-la jogar de forma ótima. A IA precisa errar de maneira que o jogador não perceba a mão do designer — caso contrário, o jogador se sente enganado, e a ilusão se quebra.
 
 ---
@@ -187,14 +187,14 @@ As fases de **Sentir** e **Agir**, embora menos exploradas pelos algoritmos, sã
 
 **Sentir (Percepção).** É a fase em que o agente coleta informações sobre o estado do mundo. Em jogos, a percepção raramente é "física" no sentido literal; o agente pode simplesmente consultar variáveis do jogo. No entanto, **limitar deliberadamente a percepção é uma das ferramentas mais importantes da ilusão de inteligência**. Um inimigo que soubesse instantaneamente a posição exata do jogador (informação que está trivialmente disponível no código) pareceria onisciente e injusto. Por isso, projetistas modelam sensores *falíveis*: campos de visão com ângulo e alcance limitados, audição baseada em distância e obstáculos, "memória" curta da última posição vista. É a percepção limitada que permite ao jogador se esconder, despistar e enganar — o coração de qualquer jogo de furtividade.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Em *Alien Isolation* (2014), boa parte da tensão vem de o Alien ter percepção limitada e falível: ele ouve sons, vê movimento, investiga, mas não sabe magicamente onde o jogador está. O jogador aprende a manipular essa percepção — ficar imóvel, evitar barulho, usar distrações. Sem a *limitação* deliberada da percepção, não haveria jogo. Estudaremos o "sistema de dois cérebros" desse título no Capítulo 15.
 
 **Pensar (Decisão).** É a fase central, em que o agente, a partir do que percebeu, escolhe o que fazer. É aqui que residem quase todas as técnicas desta apostila. A decisão pode ser trivial (uma regra "se vejo o jogador, atiro") ou complexa (uma busca em árvore de jogadas possíveis). O ponto-chave é que **a sofisticação da decisão deve ser proporcional à necessidade da experiência e ao orçamento de processamento** — não à ambição acadêmica.
 
 **Agir (Atuação).** É a fase em que a decisão vira ação observável: mover-se, animar-se, disparar, falar. A qualidade da atuação também alimenta a ilusão: uma boa decisão executada com uma animação abrupta ou um movimento robótico pode parecer "burra". Inversamente, animações de "reação" (o inimigo se assusta, olha em volta, hesita) reforçam enormemente a impressão de inteligência, mesmo sem mudar a lógica de decisão. Muitas vezes, o que o jogador lê como "inteligência" é, na verdade, **boa comunicação do estado interno** por meio de animação, som e diálogo.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Reforce a ilusão de inteligência tornando o "pensamento" do agente **visível e audível**. Um inimigo que grita "Ele foi por ali!" ou que visivelmente hesita ao perder o jogador de vista comunica seu estado interno ao jogador. Essa comunicação (chamada às vezes de "barks", falas curtas contextuais) é frequentemente mais eficaz para a percepção de inteligência do que qualquer refinamento no algoritmo de decisão.
 
 ### 1.3.2 Agentes reativos, deliberativos e híbridos
@@ -238,12 +238,12 @@ Talvez a diferença mais concreta entre IA acadêmica e IA de jogos seja a **res
 
 A esse tempo alocado para a IA dá-se o nome de **orçamento de quadro** (*frame budget*). Todo o "pensar" de todos os agentes precisa caber nesse orçamento. Se a IA estourar seu tempo, o jogo perde quadros (*frame drops*), trava e a experiência se degrada — um custo inaceitável.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > Suponha um jogo de estratégia com 200 unidades na tela, rodando a 60 FPS. Se cada unidade precisasse recalcular um caminho complexo a cada quadro, o custo seria proibitivo. A solução da indústria é uma combinação de técnicas: distribuir o cálculo ao longo de vários quadros (*time-slicing*), recalcular apenas quando necessário, usar níveis de detalhe de IA (*LOD* de IA, agentes distantes "pensam" menos), e escolher algoritmos mais baratos como o JPS+ (Capítulo 9). O orçamento de quadro molda quais algoritmos são sequer viáveis.
 
 Essa restrição tem uma consequência conceitual central para toda a apostila: **um algoritmo "melhor" no papel pode ser inutilizável na prática se for caro demais**. Frequentemente, a indústria prefere uma solução aproximada e barata a uma solução ótima e cara. Esse trade-off entre qualidade da decisão e custo aparecerá em praticamente todos os capítulos — do pathfinding (onde trocamos otimalidade por velocidade) ao Minimax (onde limitamos a profundidade da busca para caber no tempo).
 
-> **Atenção**
+> ⚠️ **Atenção**
 > O orçamento de quadro não é fixo entre plataformas. Um jogo de console ou PC de alto desempenho tem mais folga que um jogo mobile rodando em um aparelho modesto. A mesma técnica de IA pode ser viável em uma plataforma e inviável em outra. Ao avaliar uma técnica, pergunte sempre: *cabe no orçamento da plataforma-alvo?*
 
 ### 1.4.2 Controle do designer e autoria
@@ -257,10 +257,10 @@ Esse critério explica muito da preferência da indústria por técnicas **trans
 - **Máquinas de estado e árvores de comportamento** são populares em grande parte porque um designer consegue *ver* e *editar* a lógica, muitas vezes em ferramentas visuais, sem escrever código.
 - Técnicas de **aprendizado de máquina**, por outro lado, produzem comportamentos difíceis de controlar diretamente: não se "edita" uma rede neural apontando o que ela deve fazer numa situação específica. Isso limita seu uso comercial, apesar de seu poder.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A necessidade de autoria levou ao desenvolvimento de **ferramentas visuais de IA** dentro das engines. Na Unity, o pacote **Unity Behavior** (a partir de 2024) e o **Visual Scripting** permitem que designers montem lógicas de comportamento graficamente; o **Animator Controller** permite editar máquinas de estado visualmente. Na Unreal, as *Behavior Trees* e o *State Tree* cumprem papel semelhante. Essas ferramentas existem precisamente para dar controle e autoria a quem projeta a experiência, não apenas a quem programa. Veremos cada uma no contexto da técnica correspondente.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao escolher uma técnica de IA para um projeto, pese não apenas seu poder, mas quanto **controle e depurabilidade** ela oferece à equipe. Uma técnica ligeiramente menos poderosa, porém transparente e ajustável, costuma produzir um jogo melhor do que uma técnica poderosa e opaca. "Poder controlar" vale mais do que "ser esperto".
 
 ---
@@ -283,7 +283,7 @@ Cada família responde a uma pergunta diferente que um agente pode precisar reso
 
 **Análise interpretativa.** Repare que cada família se encaixa predominantemente na fase **Pensar** do ciclo do agente, mas responde a uma *pergunta* distinta. Um jogo comercial complexo tipicamente combina várias dessas famílias no mesmo personagem: um inimigo pode usar uma **árvore de comportamento** (Parte II) para decidir sua tática, **A\*** (Parte III) para se mover, um **mapa de influência** (Parte IV) para escolher a melhor cobertura, e falas contextuais para comunicar tudo isso ao jogador. As famílias não são alternativas exclusivas; são **peças complementares de um mesmo quebra-cabeça**.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao longo da apostila, sempre que encontrar uma técnica nova, situe-a mentalmente neste mapa: *a que família pertence? que pergunta responde? onde entra no ciclo Sentir–Pensar–Agir? com quais outras técnicas costuma se combinar?* Essa disciplina evita o erro comum de estudar técnicas como fatos isolados, sem enxergar como elas se articulam num sistema de IA real.
 
 [IMAGEM NECESSÁRIA]
@@ -314,7 +314,7 @@ Ao longo do texto, informações complementares aparecem em **boxes** (quadros d
 
 Além destes, o box **Contexto Histórico** é usado para situar temporalmente a origem de conceitos e técnicas.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Numa primeira leitura de estudo, não pule os boxes de **Atenção** e **Erro Comum**: eles concentram os pontos onde a maioria dos estudantes tropeça. Os boxes de **Curiosidade** podem ser deixados para uma segunda leitura, se o tempo for curto.
 
 ### 1.6.2 Convenções de diagramas, imagens e código
@@ -325,7 +325,7 @@ Além destes, o box **Contexto Histórico** é usado para situar temporalmente a
 
 **Código.** O foco da apostila é **conceitual**, não a programação. Portanto, código aparece **apenas quando esclarece um conceito**, e sempre em pequenos trechos ou em **pseudocódigo**, nunca como tutorial de implementação. O leitor não deve esperar (nem procurar) instruções passo a passo de programação ou de uso de menus da Unity.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Esta apostila **não é** um manual da Unity nem um livro de algoritmos. Quando mencionamos ferramentas da Unity (Animator, NavMesh, Unity Behavior, ML-Agents), é para *contextualizar* onde o conceito aparece na prática — nunca para ensinar o passo a passo de menus. Da mesma forma, quando apresentamos um algoritmo, o objetivo é a *compreensão* de seu funcionamento e de seus trade-offs, não a otimização de sua implementação.
 
 ### 1.6.3 Trilhas de leitura: percurso essencial × percurso de aprofundamento
@@ -337,7 +337,7 @@ Nem todo conteúdo tem o mesmo peso. Seguindo o Planejamento Editorial, a aposti
 
 São exemplos de conteúdo de **aprofundamento** (assim marcados quando surgirem): o planejamento GOAP e a IA de utilidade (Capítulo 6), a busca Monte Carlo em árvore (MCTS, Capítulo 11) e o aprendizado por reforço profundo (*Deep RL*, Capítulo 12).
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Se você está estudando para uma primeira aprovação na disciplina, priorize o percurso essencial e garanta o domínio dos fundamentos desta Parte I — eles são pré-requisito de tudo o mais. Volte aos trechos de aprofundamento depois, quando o essencial estiver sólido. Toda a Parte I integra o percurso essencial.
 
 ---

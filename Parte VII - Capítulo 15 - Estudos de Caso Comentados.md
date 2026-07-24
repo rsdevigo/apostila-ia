@@ -14,7 +14,7 @@ Um compromisso, firmado no Capítulo 14, vale para cada linha do que se segue. D
 
 Onde um jogo tem documentação rica (*F.E.A.R.*, *Halo*, *Left 4 Dead*, *Black & White*), o texto se apoia nela e a credita. Onde a documentação é escassa, o texto trabalha por inferência e o diz com todas as letras. **Nunca** apresentamos hipótese como fato.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao ler cada estudo, tente **antecipar** a análise antes de chegar às conclusões: dada a contextualização e o problema, que técnica *você* levantaria? Comparar sua hipótese com a do texto — e com a documentação, quando existe — é o exercício mais valioso do capítulo. Melhor ainda: jogue (ou assista a *gameplay* de) cada título e aplique o roteiro do Capítulo 14 você mesmo.
 
 ---
@@ -192,7 +192,7 @@ Essa inversão é o coração da elegância do sistema **[Documentado como princ
 
 *The Sims* é o estudo de caso canônico de **IA de utilidade (Parte II, Cap. 6)**: escolha por **ponderação** de múltiplos fatores via **curvas de utilidade**, em vez de regras binárias — exatamente os "sinais de utility AI" do Capítulo 14. É também um exemplo brilhante de como uma decisão de **arquitetura de IA** (objetos que anunciam utilidade) é simultaneamente uma decisão de **engenharia de software** (extensibilidade, baixo acoplamento) — um tema que reaparece em *F.E.A.R.* e *Halo*. E contrasta nitidamente com FSM/BT: onde aquelas **enumeram** comportamentos, a utility AI os **pondera**, produzindo transições suaves e "humanas" difíceis de reduzir a um punhado de estados discretos.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > A ideia de "objetos que anunciam o que oferecem" antecipou, em espírito, padrões de arquitetura de software orientada a componentes e é frequentemente citada como um dos exemplos mais elegantes de IA de jogos justamente porque resolve, de uma só tacada, um problema de **decisão** (utility AI) e um problema de **extensibilidade** (smart objects). Muitos jogos de simulação e *management* posteriores adotaram variações da mesma ideia.
 
 ### Limitações da análise
@@ -232,7 +232,7 @@ O problema era a **rejogabilidade e o ritmo**. Um jogo cooperativo de zumbis com
 
 O AI Director é um caso precioso porque opera numa **camada diferente** das técnicas de NPC individual: não é um agente, é um **sistema de orquestração** que atua sobre o jogo como um todo. Ele dialoga com vários temas da apostila. Com o Capítulo 14, ilustra o cuidado de **não confundir adaptação por regras com aprendizado**: parece que "o jogo aprende com você", mas é realimentação determinística sobre métricas, não RL (Parte VI). Com a Parte I, é a **ilusão de inteligência** numa escala macro — o jogo parece "sentir" seu medo. E com o design, mostra que IA em jogos não se resume a NPCs: pode ser um **diretor dramático** que administra a experiência.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > O conceito de "diretor de IA" para gerir ritmo e dificuldade tornou-se um padrão de design influente após *Left 4 Dead*. Variações da ideia — sistemas que monitoram o estado do jogador e ajustam desafio, recursos ou eventos em tempo real — aparecem em muitos jogos posteriores de gêneros variados. É um exemplo de como uma boa arquitetura de IA pode virar uma **linguagem de design** adotada pela indústria inteira.
 
 ### Limitações da análise
@@ -324,7 +324,7 @@ O problema é de uma **escala e complexidade** que os NPCs de ação não enfren
 
 Este caso é a aplicação de manual dos **mapas de influência (Parte IV, Cap. 10)**: propagação, decaimento e camadas usados para transformar o estado espacial do jogo em **valores** que orientam a decisão de **onde** agir. É também o melhor exemplo de **decisão em larga escala** e de **arquitetura em subsistemas** (gerentes especializados), contrastando com o foco em um único agente das seções anteriores. E dialoga com a Parte V: em *Civilization*, a avaliação de posições e o "pensar à frente" por turno têm parentesco com a lógica de **função de avaliação** e busca adversarial, ainda que sobre um espaço grande demais para Minimax puro. O caso mostra que, em estratégia, a IA é menos "um cérebro" e mais uma **orquestra de sistemas** — de novo, tanto IA quanto engenharia.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Atribuir a força da IA de estratégia a um "planejamento sobre-humano" quando, muitas vezes, ela combina **avaliação espacial** (mapas de influência) + **regras de build** + **bônus de dificuldade**. Reconhecer os bônus assimétricos é parte da análise honesta: uma IA que ganha porque começa com o dobro de recursos não é mais "inteligente" — é mais **subsidiada**. Distinguir competência de compensação é exatamente o tipo de discernimento que o Capítulo 14 treina.
 
 ### Limitações da análise
@@ -364,7 +364,7 @@ O mecanismo de ensino é uma forma de **aprendizado por reforço em espírito** 
 
 *Black & White* é o estudo de caso que **materializa a Parte VI** num jogo comercial. Ele exibe **aprendizado por reforço em espírito** (recompensa/punição moldando comportamento), **aprendizado supervisionado** (árvores de decisão aprendidas de exemplos rotulados) e **perceptrons** (a raiz das redes neurais) — tudo o que, na maioria dos jogos, é apenas prestígio acadêmico, aqui é jogabilidade central. É também um contraponto perfeito a *Left 4 Dead* (15.5): ambos "parecem se adaptar ao jogador", mas *L4D* usa **regras sobre métricas** (não aprende), enquanto *Black & White* **aprende de verdade** (muda de forma persistente e generaliza). Colocar os dois lado a lado é o melhor exercício possível do alerta do Capítulo 14 sobre não confundir adaptação com aprendizado — porque aqui, excepcionalmente, é aprendizado mesmo.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > *Black & White* é frequentemente citado como um dos usos mais ambiciosos de aprendizado de máquina em um jogo comercial — e também como ilustração de **por que** isso é raro. Aprendizado genuíno é **poderoso** (cada criatura é única) mas **difícil de controlar e depurar**: uma criatura pode aprender comportamentos indesejados, e o desenvolvedor tem menos controle sobre o resultado final do que teria com regras. Esse *trade-off* entre riqueza e controle é exatamente a tensão discutida na Parte VI, e é a razão pela qual a indústria, em geral, prefere o determinismo — reservando o aprendizado para quando ele é o **coração** da experiência, como aqui.
 
 ### Limitações da análise
@@ -404,7 +404,7 @@ Havia dois problemas distintos e difíceis. O primeiro, o da **IA de companheiro
 
 *The Last of Us* costura vários temas da apostila num jogo de altíssimo acabamento. A decisão dos agentes remete às **behavior trees (Parte II, Cap. 6)**; a furtividade é um estudo de **percepção/sensoriamento** (Parte I) e de **estados de alerta** (parente da FSM), muito próximo de *Alien: Isolation*, mas aplicado a grupos; a navegação usa **pathfinding** (Parte III). Mas a lição mais forte é sobre a **ilusão de inteligência** e o **design acima do realismo**: a decisão de tornar o companheiro **invisível à detecção** é uma "trapaça" que sacrifica o realismo para **proteger a experiência** — exatamente o tipo de escolha que o Capítulo 14 ensina a **reconhecer** por suas evidências observáveis (a assimetria de percepção). É o caso que melhor mostra que, na IA de jogos, **a experiência do jogador vale mais que a coerência da simulação**.
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A IA de companheiro é um dos problemas mais subestimados e mais difíceis do design de jogos: um aliado ruim frustra mais do que um inimigo ruim. A solução da Naughty Dog — priorizar **nunca atrapalhar** o jogador, mesmo à custa de "trapaças" invisíveis — tornou-se uma referência de como pensar IA de suporte. A lição transcende o jogo: em IA de jogos, quando **realismo** e **experiência** entram em conflito, a experiência quase sempre vence. É a "ilusão de inteligência" aplicada não ao inimigo, mas ao amigo.
 
 ### Limitações da análise

@@ -8,7 +8,7 @@ A resposta que a indústria consolidou é uma ideia que aparece repetidamente na
 
 Este capítulo é a continuação natural do anterior e assume tudo o que foi visto nele. Seguimos a mesma filosofia: partimos do **problema** (a complexidade das FSMs grandes), construímos os **fundamentos** da hierarquia (superestados, subestados e histórico), detalhamos o **funcionamento** (herança de transições e memória de estado), ilustramos com um **exemplo** de combate em camadas, pesamos **vantagens e limitações** — apontando o que a HFSM ainda *não* resolve, o que motivará os capítulos seguintes — e aterrissamos nas **ferramentas** (as sub-state machines do Animator, o pacote Unity Behavior, o State Tree da Unreal) e no **mercado**.
 
-> **Contexto Histórico**
+> 🕰️ **Contexto Histórico**
 > A ideia de hierarquizar máquinas de estado não é exclusiva dos jogos: ela foi formalizada de modo influente por David Harel em 1987, com os **statecharts**, uma extensão das máquinas de estado que introduziu hierarquia, concorrência e memória. Os statecharts tornaram-se um padrão na engenharia de sistemas reativos e influenciaram notações como a UML. A IA de jogos, mais uma vez, adotou uma ferramenta madura de outra área: quando os jogos dos anos 1990 e 2000 cresceram a ponto de suas FSMs se tornarem ingerenciáveis, a hierarquização — já bem compreendida em engenharia de software — foi a resposta natural.
 
 ---
@@ -23,7 +23,7 @@ Há aqui uma redundância estrutural gritante. Os cinco estados de combate — a
 
 Esse é o problema que a HFSM resolve. Ela permite agrupar os estados de combate sob um **superestado** "Combate" e associar a esse superestado as transições comuns. Cada subestado (atirar, avançar...) herda automaticamente as transições do superestado. A regra "se vida baixa → fugir" passa a ser escrita **uma vez**, no superestado, e vale para todos os subestados. A redundância desaparece; a manutenção se simplifica; a máquina volta a ser legível.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > A pergunta que revela a necessidade de hierarquia é: *"há um conjunto de estados que compartilham as mesmas transições de saída?"* Se a resposta for sim — e em comportamentos de jogo ela quase sempre é —, esses estados formam uma família que pede um superestado. "Enquanto estou em qualquer modo de combate, se levar dano grave eu fujo" é uma frase que descreve, ao mesmo tempo, um superestado (combate) e uma transição herdada (dano grave → fugir).
 
 ---
@@ -79,7 +79,7 @@ Precisamos, contudo, ser cuidadosos com dois tipos de transição entre níveis:
 
 **Transições que entram diretamente em um subestado profundo.** Às vezes queremos transitar não para o subestado inicial de um superestado, mas diretamente para um subestado específico e profundo (por exemplo, "ao ser emboscado, entrar direto em Combate → Corpo a corpo"). A HFSM permite isso, mas o projetista deve garantir que todas as ações de entrada da cadeia sejam disparadas na ordem correta (enter de Combate, depois enter de Corpo a corpo).
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Esquecer de disparar as ações **enter/exit dos níveis intermediários** ao transitar entre hierarquias. Ao pular de "Pacífico → Patrulhar" para "Combate → Corpo a corpo", uma implementação descuidada executa o *exit* de Patrulhar e o *enter* de Corpo a corpo, mas **esquece** o *exit* de Pacífico e o *enter* de Combate. O resultado são inicializações perdidas (o superestado Combate não "se preparou") e vazamentos de estado (o superestado Pacífico não "se encerrou"). Regra de ouro: ao mudar de configuração, execute os *exit* da cadeia antiga de dentro para fora e os *enter* da cadeia nova de fora para dentro, até o ponto em que as duas cadeias divergem.
 
 ### 4.3.2 Estado de histórico (memória)
@@ -90,10 +90,10 @@ O exemplo torna a utilidade evidente. Nosso inimigo está em "Combate → Recarr
 
 A literatura de statecharts distingue dois tipos de histórico: o **histórico raso** (*shallow history*), que lembra apenas o subestado imediato do nível em questão, e o **histórico profundo** (*deep history*), que lembra a configuração completa de toda a subárvore, em todos os níveis. Para a maioria dos comportamentos de jogo, o histórico raso já é suficiente; o profundo é útil quando há várias camadas de aninhamento cuja configuração completa importa.
 
-> **Na Prática**
+> 🎮 **Na Prática**
 > O estado de histórico é uma das ferramentas mais eficazes para *fabricar credibilidade* de forma barata. Um NPC que, ao ser interrompido, **retoma exatamente o que fazia** — volta a recarregar, retoma a conversa no ponto em que parou, continua a patrulha do trecho onde estava — parece ter *memória* e *intenção persistente*. É a diferença entre um personagem que "vive" no mundo e um que "renasce" a cada mudança de estado. E, como quase tudo na ilusão de inteligência, o mecanismo por baixo é modesto: apenas guardar qual subestado estava ativo.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Histórico é poderoso, mas nem sempre é o que se quer. Em algumas situações, *reiniciar* pelo subestado inicial é o comportamento correto — por exemplo, ao reentrar em "Patrulha" o guarda talvez deva recomeçar a rota do começo, não do meio. Decida, para cada superestado, se ele deve ter memória (histórico) ou recomeçar do zero (subestado inicial). Aplicar histórico indiscriminadamente produz comportamentos "grudentos" e às vezes ilógicos.
 
 ---
@@ -130,7 +130,7 @@ Como produzir: Ferramenta de diagramação com suporte a estados aninhados (draw
 Legenda sugerida: Figura 4.1 — HFSM do inimigo: os superestados Pacífico e Combate agrupam submáquinas coesas; a regra de sobrevivência, escrita uma única vez na borda de Combate, é herdada por todos os subestados de combate.
 [/IMAGEM NECESSÁRIA]
 
-> **Na Indústria**
+> 🏭 **Na Indústria**
 > A organização "comportamento de alto nível → submáquinas táticas" é um padrão consagrado em jogos de tiro e de ação. Um NPC costuma ter um nível estratégico (pacífico, alerta, combate, retirada) e, dentro de cada um, submáquinas de detalhe. Essa separação em camadas também facilita a divisão de trabalho na equipe: um designer pode ajustar a submáquina de combate sem tocar na de patrulha, e vice-versa — uma vantagem de *produção*, não apenas de *código*, coerente com o critério de autoria da Parte I.
 
 ---
@@ -147,7 +147,7 @@ A HFSM, entretanto, **não elimina** os problemas de fundo da família FSM — a
 
 É precisamente essa última limitação que abre caminho para as próximas arquiteturas. As **árvores de decisão** (Capítulo 5) reorganizam a lógica em torno de *testes encadeados* em vez de estados, servindo de ponte conceitual; e as **árvores de comportamento** (Capítulo 6) reorganizam-na em torno de *tarefas compostas e reutilizáveis*, atacando de frente o acoplamento e a rigidez que a HFSM apenas atenua. A HFSM, note-se, não é tornada obsoleta — ela continua sendo a melhor escolha para comportamento genuinamente modal —, mas deixa de ser a resposta única.
 
-> **Erro Comum**
+> ❌ **Erro Comum**
 > Acreditar que a HFSM "resolve de vez" os problemas da FSM. Ela os *administra*, não os elimina. Uma HFSM mal hierarquizada — com superestados escolhidos sem critério, ou com transições entre níveis emaranhadas — pode ser tão difícil de manter quanto a FSM plana que pretendia substituir. A hierarquia é uma ferramenta de organização; como toda organização, só ajuda se a divisão em grupos refletir a estrutura real do problema.
 
 ---
@@ -162,7 +162,7 @@ A hierarquização de estados é onipresente em jogos de porte médio e grande, 
 
 **Jogos de simulação e gerenciamento.** Personagens com muitas atividades (trabalhar, socializar, cuidar de necessidades) frequentemente organizam esses comportamentos em camadas. Ainda que jogos de simulação sofisticados tendam a usar IA de utilidade (Capítulo 6), a estruturação hierárquica de comportamentos modais aparece com frequência como componente.
 
-> **Curiosidade**
+> 🎲 **Curiosidade**
 > Vários motores e frameworks de IA de jogos oferecem HFSM "de fábrica", mas muitos estúdios, ao crescerem, migraram de HFSMs para **árvores de comportamento** justamente pelas limitações da seção 4.5 — a dificuldade de reutilizar e reordenar comportamento. Essa migração histórica, ocorrida sobretudo a partir de meados dos anos 2000, é o pano de fundo do Capítulo 6 e um exemplo concreto da lição da Parte I: as técnicas se acumulam e se sucedem conforme os problemas de produção evoluem.
 
 ---
@@ -177,7 +177,7 @@ Como sempre, o foco é reconhecer o conceito nas ferramentas, não decorar menus
 
 **HFSM em C#.** Também é comum implementar HFSMs diretamente em código, estendendo o padrão *State* do Capítulo 3 para que estados possam conter submáquinas (um estado que, em seu `Update`, delega para a submáquina interna, e cujas transições de nível têm prioridade sobre as internas). É a abordagem que melhor espelha os conceitos deste capítulo e que oferece controle total sobre a ordem de avaliação e sobre o histórico.
 
-> **Atenção**
+> ⚠️ **Atenção**
 > Repetimos a ressalva do Capítulo 3, agora agravada: usar o **Animator (com sub-state machines) para toda a lógica de decisão** de um agente complexo mistura as responsabilidades de "cérebro" e "corpo" e pode reproduzir, dentro do editor de animação, os problemas de manutenção que a hierarquia deveria evitar. Sub-state machines são excelentes para organizar *animação*; para *decisão* complexa, avalie ferramentas dedicadas (Unity Behavior, soluções de terceiros) ou uma implementação em código.
 
 ---
@@ -188,7 +188,7 @@ No ecossistema Unity, as ferramentas de terceiros mais conhecidas para IA — **
 
 Como comparação entre engines, vale destacar novamente o **State Tree** da Unreal Engine, que combina a hierarquia das máquinas de estado com a seleção estruturada em árvore, situando-se num ponto intermediário entre a HFSM deste capítulo e as árvores de comportamento do próximo — uma evidência de que a fronteira entre "estados hierárquicos" e "árvores de tarefas" é mais um espectro do que uma divisão rígida.
 
-> **Boa Prática**
+> ✅ **Boa Prática**
 > Ao escolher uma ferramenta de HFSM, verifique especialmente três pontos que a teoria deste capítulo mostrou serem críticos: (1) ela deixa **visível e correta** a ordem de avaliação entre níveis (superestado antes ou depois do subestado)? (2) ela suporta **estado de histórico**, para retomar comportamentos interrompidos? (3) ela dispara corretamente as ações **enter/exit de todos os níveis** intermediários nas transições entre hierarquias? Uma ferramenta que erra nesses pontos produz bugs sutis de continuidade e inicialização.
 
 ---
