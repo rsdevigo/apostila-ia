@@ -7,6 +7,29 @@
   <meta name="description" content="Apostila de Inteligência Artificial para Jogos Digitais">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <style>
+    details.diagrama-spec {
+      margin: 0.75em 0 1.5em;
+      padding: 0.6em 1em;
+      background: #f6f6f6;
+      border-left: 3px solid #42b983;
+      border-radius: 4px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    details.diagrama-spec summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #2c3e50;
+      outline: none;
+    }
+    details.diagrama-spec summary:hover {
+      color: #42b983;
+    }
+    details.diagrama-spec p {
+      margin: 0.6em 0 0;
+    }
+  </style>
 </head>
 <body>
   <div id="app"></div>
@@ -33,7 +56,54 @@
   <script src="//cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-mermaid@2/dist/docsify-mermaid.js"></script>
   <script>
-    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+
+    // Quando um diagrama [DIAGRAMA]...[/DIAGRAMA] contém um bloco Mermaid renderizado,
+    // recolhe o texto de especificação (Título/Objetivo/Descrição/Elementos obrigatórios)
+    // dentro de um <details>, deixando o diagrama renderizado como destaque principal.
+    // O texto continua acessível (clique para expandir) — não é removido, só recolhido.
+    window.$docsify.plugins = (window.$docsify.plugins || []).concat(function (hook) {
+      hook.doneEach(function () {
+        var section = document.querySelector('.markdown-section');
+        if (!section) return;
+        var paragraphs = section.querySelectorAll('p');
+        for (var i = 0; i < paragraphs.length; i++) {
+          var p = paragraphs[i];
+          if (p.textContent.trim().indexOf('[DIAGRAMA]') !== 0) continue;
+
+          var between = [];
+          var node = p.nextElementSibling;
+          var closing = null;
+          while (node) {
+            if (node.tagName === 'P' && node.textContent.trim() === '[/DIAGRAMA]') {
+              closing = node;
+              break;
+            }
+            between.push(node);
+            node = node.nextElementSibling;
+          }
+          if (!closing) continue;
+
+          var hasMermaid = between.some(function (n) {
+            return n.classList && n.classList.contains('mermaid');
+          });
+          if (!hasMermaid) continue;
+
+          var details = document.createElement('details');
+          details.className = 'diagrama-spec';
+          var summary = document.createElement('summary');
+          summary.textContent = 'Especificação do diagrama (clique para expandir)';
+          details.appendChild(summary);
+          var body = document.createElement('p');
+          body.textContent = p.textContent.trim().replace(/^\[DIAGRAMA\]\s*/, '');
+          details.appendChild(body);
+
+          p.parentNode.insertBefore(details, p);
+          p.parentNode.removeChild(p);
+          closing.parentNode.removeChild(closing);
+        }
+      });
+    });
   </script>
 </body>
 </html>

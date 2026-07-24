@@ -65,7 +65,7 @@ stateDiagram-v2
     }
     Pacifico --> Combate: vê o jogador
     Combate --> Pacifico: perdeu o alvo
-    Combate --> Fugir: vida < 20%\n(herdada por todos os subestados)
+    Combate --> Fugir: vida menor que 20% (herdada por todos os subestados)
 ```
 [/DIAGRAMA]
 

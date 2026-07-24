@@ -62,12 +62,12 @@ Elementos obrigatórios: três estados como círculos; setas dirigidas rotuladas
 ```mermaid
 stateDiagram-v2
     [*] --> Patrulhar
-    Patrulhar: Patrulhar\n(ação: seguir rota de pontos)
-    Perseguir: Perseguir\n(ação: mover até o jogador)
-    Atacar: Atacar\n(ação: atacar corpo a corpo)
+    Patrulhar: ação — seguir rota de pontos
+    Perseguir: ação — mover até o jogador
+    Atacar: ação — atacar corpo a corpo
     Patrulhar --> Perseguir: vê o jogador
-    Perseguir --> Atacar: distância < 2 m
-    Atacar --> Perseguir: distância > 2 m
+    Perseguir --> Atacar: distância menor que 2 m
+    Atacar --> Perseguir: distância maior que 2 m
     Perseguir --> Patrulhar: perdeu o jogador de vista
 ```
 [/DIAGRAMA]
