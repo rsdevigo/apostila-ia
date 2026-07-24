@@ -69,7 +69,11 @@
         var paragraphs = section.querySelectorAll('p');
         for (var i = 0; i < paragraphs.length; i++) {
           var p = paragraphs[i];
-          if (p.textContent.trim().indexOf('[DIAGRAMA]') !== 0) continue;
+          var pText = p.textContent.trim();
+          if (pText.indexOf('[DIAGRAMA]') !== 0) continue;
+          // Bloco autocontido (abre e fecha no mesmo parágrafo, sem linha em branco
+          // antes de [/DIAGRAMA]): não há Mermaid possível aqui, pula.
+          if (pText.indexOf('[/DIAGRAMA]') !== -1) continue;
 
           var between = [];
           var node = p.nextElementSibling;
@@ -77,6 +81,11 @@
           while (node) {
             if (node.tagName === 'P' && node.textContent.trim() === '[/DIAGRAMA]') {
               closing = node;
+              break;
+            }
+            // Encontrou o início de outro bloco [DIAGRAMA] antes de fechar o atual:
+            // este bloco não tem fechamento próprio (ficou mesclado em outro parágrafo).
+            if (node.tagName === 'P' && node.textContent.trim().indexOf('[DIAGRAMA]') === 0) {
               break;
             }
             between.push(node);
