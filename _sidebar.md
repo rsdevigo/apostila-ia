@@ -28,3 +28,18 @@
   - [Apresentação](Parte%20V%20-%20Apresentação.md)
   - [Capítulo 11 - Minimax e Busca Adversarial](Parte%20V%20-%20Capítulo%2011%20-%20Minimax%20e%20Busca%20Adversarial.md)
   - [Encerramento](Parte%20V%20-%20Encerramento.md)
+
+- **Parte VI**
+  - [Apresentação](Parte%20VI%20-%20Apresentação.md)
+  - [Capítulo 12 - Aprendizagem por Reforço](Parte%20VI%20-%20Capítulo%2012%20-%20Aprendizagem%20por%20Reforço.md)
+  - [Capítulo 13 - Heurísticas e Algoritmos Genéticos](Parte%20VI%20-%20Capítulo%2013%20-%20Heurísticas%20e%20Algoritmos%20Genéticos.md)
+  - [Encerramento](Parte%20VI%20-%20Encerramento.md)
+
+- **Parte VII**
+  - [Apresentação](Parte%20VII%20-%20Apresentação.md)
+  - [Capítulo 14 - Metodologia de Engenharia Reversa de IA](Parte%20VII%20-%20Capítulo%2014%20-%20Metodologia%20de%20Engenharia%20Reversa%20de%20IA.md)
+  - [Capítulo 15 - Estudos de Caso Comentados](Parte%20VII%20-%20Capítulo%2015%20-%20Estudos%20de%20Caso%20Comentados.md)
+  - [Encerramento](Parte%20VII%20-%20Encerramento.md)
+
+- **Apêndices**
+  - [A–D — Glossário, Ferramentas, Tabelas e Referências](Apêndices.md)
